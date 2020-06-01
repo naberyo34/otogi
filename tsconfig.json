@@ -15,7 +15,6 @@
     "noEmit": true,
     "jsx": "react",
     "baseUrl": "src", // importを絶対パスで書けるようになる
-    "incremental": true // 再コンパイルが早くなる
   },
   "include": ["src"],
   "exclude": ["node_modules", "build", "scripts", "functions"] // Firebaseとかち合わないようにする
