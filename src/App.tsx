@@ -15,7 +15,7 @@ const App: React.FC = () => {
       <button type="button" onClick={handleClick}>
         する
       </button>
-      <p className="">{dice}</p>
+      <p className="result">{dice}</p>
     </div>
   );
 };
