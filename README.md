@@ -5,7 +5,10 @@
 - GMの進行の容易さを最優先に考え、まずは最低限の確実に役立つ機能のみに絞って開発していきます。
 ## 機能
 - リアルタイムダイスロール
-## 開発
+## 開発コマンド
+- `yarn start`でプレビュー起動。
+## 技術
+- TypeScript
 - React (Hooks)
 - Redux, React-Redux
 - Firebase
