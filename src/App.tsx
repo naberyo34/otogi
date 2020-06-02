@@ -2,25 +2,33 @@ import React, { useState, useEffect } from 'react';
 import { firestore } from './services/firebase';
 import './App.css';
 import diceRoll, { DiceResult } from './services/diceRoll';
+import formatDate from './services/formatDate';
 
 interface Result {
   playerName: string;
   dice: DiceResult;
+  timestamp: string;
 }
 
 const App: React.FC = () => {
   const [myName, setMyName] = useState('');
   const [diceCount, setDiceCount] = useState({ value: '1' });
   const [diceSize, setDiceSize] = useState({ value: '100' });
-  const [currentResult, setCurrentResult] = useState<Result>({
+  // TODO: firebaseのDocumentData型とResult型を併用する方法が不明 気に入らない
+  const [currentResult, setCurrentResult] = useState<
+    firebase.firestore.DocumentData
+  >({
     playerName: '',
     dice: {
       type: '',
       single: [],
       last: 0,
     },
+    timestamp: '',
   });
-  const [resultLog, setResultLog] = useState<Result[]>([]);
+  const [resultLog, setResultLog] = useState<firebase.firestore.DocumentData>(
+    []
+  );
 
   // ダイスの個数(回数)を設定
   const handleChooseDiceCount = (e: any) => {
@@ -48,30 +56,35 @@ const App: React.FC = () => {
     }
 
     const dice = diceRoll(Number(diceCount.value), Number(diceSize.value));
-    firestore.collection('diceLog').add({
-      result: {
-        playerName: myName,
-        dice,
-      },
+    const currentDate = formatDate(new Date());
+
+    firestore.collection('result').add({
+      playerName: myName,
+      dice,
+      timestamp: currentDate,
     });
   };
 
   // Firestoreの変更を検知し、DOMの状態を変更
   useEffect(() => {
-    const queryCollection = firestore.collection('diceLog');
+    const queryCollection = firestore
+      .collection('result')
+      .orderBy('timestamp', 'asc');
+
     queryCollection.onSnapshot((querySnapshot) => {
       querySnapshot.docChanges().forEach((change) => {
         if (change.type === 'added') {
-          const addedData = change.doc.data();
+          const addedData: firebase.firestore.DocumentData = change.doc.data();
           const log = resultLog;
-          setCurrentResult(addedData.result);
-          // ログに最新の結果をunshiftしてstateを更新
-          log.unshift(addedData.result);
+          // currentResultを最新の結果に更新
+          setCurrentResult(addedData);
+          // ログに最新の結果をunshift
+          log.unshift(addedData);
           setResultLog(log);
         }
       });
     });
-  }, [resultLog]);
+  }, []);
 
   return (
     <div className="App">
@@ -97,19 +110,21 @@ const App: React.FC = () => {
         ダイスロール!
       </button>
       <div>
-        {currentResult.playerName}さんが{currentResult.dice.type}を振りました:{' '}
+        {currentResult.playerName} さんが {currentResult.dice.type}{' '}
+        を振りました:{' '}
       </div>
       <div className="singleResult">
-        {currentResult.dice.single.map((single) => (
+        {currentResult.dice.single.map((single: string) => (
           <p className="singleResult__num">{single}</p>
         ))}
       </div>
       <p className="result">{currentResult.dice.last}</p>
       <div className="log">
         <p>ログ: </p>
-        {resultLog.map((log) => (
+        {resultLog.map((log: Result) => (
           <p>
-            {log.playerName}さんが{log.dice.type}で{log.dice.last}を出しました。
+            [{log.timestamp}] {log.playerName} さんが {log.dice.type} で{' '}
+            {log.dice.last} を出しました
           </p>
         ))}
       </div>

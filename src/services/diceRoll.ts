@@ -15,11 +15,10 @@ const diceRoll = (count: number, size: number): DiceResult => {
   let diceResult: DiceResult = { type: `${count}D${size}`, single: [], last: 0 };
 
   while (roll < count) {
-    // 1以上size以下の乱数を生成し、lastResultに加える
-    // Math.randomは0~1の小数を生成し、Math.floorは小数点以下を全て切り捨てる
+    // 1以上size以下の乱数を生成
     const currentResult = 1 + Math.floor(Math.random() * size);
 
-    // 今回出た目をcurrentResultにpushし、lastResultに足す
+    // 今回出た目をsingle(単体の結果)にpushし、last(最終結果)に足す
     diceResult.single.push(currentResult);
     diceResult.last += currentResult;
 
