@@ -38,5 +38,25 @@
 }
 
 .result {
+  margin: 20px 0;
   font-size: 100px;
+}
+
+.singleResult {
+  display: flex;
+  justify-content: center;
+}
+
+.singleResult__num:not(:first-child) {
+  margin-left: 20px;
+}
+
+.log {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 200px;
+  background: gray;
+  overflow-y: scroll;
 }
