@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { firestore } from "./services/firebase";
-import "./App.css";
-import diceRoll from "./services/diceRoll";
+import React, { useState, useEffect } from 'react';
+import { firestore } from './services/firebase';
+import './App.css';
+import diceRoll from './services/diceRoll';
 
 interface displayResult {
   playerName: string;
@@ -12,9 +12,9 @@ interface displayResult {
 }
 
 const App: React.FC = () => {
-  const [playerName, setPlayerName] = useState("");
+  const [playerName, setPlayerName] = useState('');
   const [displayResult, setDisplayResult] = useState<displayResult>({
-    playerName: "",
+    playerName: '',
     dice: {
       single: [],
       last: 0,
@@ -30,21 +30,21 @@ const App: React.FC = () => {
   // ダイスロールボタン
   const handleDiceRoll = () => {
     if (!playerName) {
-      alert("名前を入れてくれ");
+      alert('名前を入れてくれ');
       return;
     }
 
     const dice = diceRoll(3, 6);
-    firestore.collection("dice").add({
+    firestore.collection('dice').add({
       result: { playerName, dice },
     });
   };
 
   useEffect(() => {
-    const queryCollection = firestore.collection("dice");
+    const queryCollection = firestore.collection('dice');
     queryCollection.onSnapshot((querySnapshot) => {
       querySnapshot.docChanges().forEach((change) => {
-        if (change.type === "added") {
+        if (change.type === 'added') {
           const current = change.doc.data();
           setDisplayResult(current.result);
         }
