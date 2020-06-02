@@ -75,7 +75,7 @@ const App: React.FC = () => {
 
   return (
     <div className="App">
-      <h1>otogi ver0.01</h1>
+      <h1>otogi ver0.1</h1>
       <select onChange={handleChooseDiceCount}>
         <option value="1">1</option>
         <option value="2">2</option>
