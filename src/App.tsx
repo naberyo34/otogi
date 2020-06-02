@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { firestore } from './services/firebase';
 import './App.css';
 import diceRoll, { DiceResult } from './services/diceRoll';
+import formatDate from './services/formatDate';
 
 interface Result {
   playerName: string;
   dice: DiceResult;
+  timestamp: string;
 }
 
 const App: React.FC = () => {
@@ -19,6 +21,7 @@ const App: React.FC = () => {
       single: [],
       last: 0,
     },
+    timestamp: '',
   });
   const [resultLog, setResultLog] = useState<Result[]>([]);
 
@@ -48,30 +51,37 @@ const App: React.FC = () => {
     }
 
     const dice = diceRoll(Number(diceCount.value), Number(diceSize.value));
-    firestore.collection('diceLog').add({
-      result: {
+    const currentDate = formatDate(new Date());
+
+    firestore.collection('result').add({
+      diceLog: {
         playerName: myName,
         dice,
+        timestamp: currentDate,
       },
     });
   };
 
   // Firestoreの変更を検知し、DOMの状態を変更
   useEffect(() => {
-    const queryCollection = firestore.collection('diceLog');
+    const queryCollection = firestore
+      .collection('result')
+      .orderBy('diceLog.timestamp', 'asc');
+
     queryCollection.onSnapshot((querySnapshot) => {
       querySnapshot.docChanges().forEach((change) => {
         if (change.type === 'added') {
           const addedData = change.doc.data();
           const log = resultLog;
-          setCurrentResult(addedData.result);
-          // ログに最新の結果をunshiftしてstateを更新
-          log.unshift(addedData.result);
+          // currentResultを最新の結果に更新
+          setCurrentResult(addedData.diceLog);
+          // ログに最新の結果をunshift
+          log.unshift(addedData.diceLog);
           setResultLog(log);
         }
       });
     });
-  }, [resultLog]);
+  }, []);
 
   return (
     <div className="App">
@@ -97,7 +107,8 @@ const App: React.FC = () => {
         ダイスロール!
       </button>
       <div>
-        {currentResult.playerName}さんが{currentResult.dice.type}を振りました:{' '}
+        {currentResult.playerName} さんが {currentResult.dice.type}{' '}
+        を振りました:{' '}
       </div>
       <div className="singleResult">
         {currentResult.dice.single.map((single) => (
@@ -109,7 +120,8 @@ const App: React.FC = () => {
         <p>ログ: </p>
         {resultLog.map((log) => (
           <p>
-            {log.playerName}さんが{log.dice.type}で{log.dice.last}を出しました。
+            [{log.timestamp}] {log.playerName} さんが {log.dice.type} で{' '}
+            {log.dice.last} を出しました
           </p>
         ))}
       </div>
