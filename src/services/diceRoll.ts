@@ -5,7 +5,7 @@ export interface DiceResult {
 
 /**
  * 任意の面数、任意の個数でダイスロールを行う
- * @returns result 結果の値
+ * @returns diceResult 結果の値
  * @params count ダイスを何個(何回)振るか ex: 1D100 なら 1
  * @params size ダイスの面数 ex: 1D100 なら 100
  */
@@ -25,7 +25,6 @@ const diceRoll = (count: number, size: number): DiceResult => {
     roll++;
   }
 
-  console.log(diceResult);
   return diceResult;
 };
 
