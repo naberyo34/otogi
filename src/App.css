@@ -40,3 +40,12 @@
 .result {
   font-size: 100px;
 }
+
+.singleResult {
+  display: flex;
+  justify-content: center;
+}
+
+.singleResult__num:not(:first-child) {
+  margin-left: 20px;
+}
