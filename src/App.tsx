@@ -14,7 +14,10 @@ const App: React.FC = () => {
   const [myName, setMyName] = useState('');
   const [diceCount, setDiceCount] = useState({ value: '1' });
   const [diceSize, setDiceSize] = useState({ value: '100' });
-  const [currentResult, setCurrentResult] = useState<Result>({
+  // TODO: firebaseのDocumentData型とResult型を併用する方法が不明 気に入らない
+  const [currentResult, setCurrentResult] = useState<
+    firebase.firestore.DocumentData
+  >({
     playerName: '',
     dice: {
       type: '',
@@ -23,7 +26,9 @@ const App: React.FC = () => {
     },
     timestamp: '',
   });
-  const [resultLog, setResultLog] = useState<Result[]>([]);
+  const [resultLog, setResultLog] = useState<firebase.firestore.DocumentData>(
+    []
+  );
 
   // ダイスの個数(回数)を設定
   const handleChooseDiceCount = (e: any) => {
@@ -54,11 +59,9 @@ const App: React.FC = () => {
     const currentDate = formatDate(new Date());
 
     firestore.collection('result').add({
-      diceLog: {
-        playerName: myName,
-        dice,
-        timestamp: currentDate,
-      },
+      playerName: myName,
+      dice,
+      timestamp: currentDate,
     });
   };
 
@@ -66,17 +69,17 @@ const App: React.FC = () => {
   useEffect(() => {
     const queryCollection = firestore
       .collection('result')
-      .orderBy('diceLog.timestamp', 'asc');
+      .orderBy('timestamp', 'asc');
 
     queryCollection.onSnapshot((querySnapshot) => {
       querySnapshot.docChanges().forEach((change) => {
         if (change.type === 'added') {
-          const addedData = change.doc.data();
+          const addedData: firebase.firestore.DocumentData = change.doc.data();
           const log = resultLog;
           // currentResultを最新の結果に更新
-          setCurrentResult(addedData.diceLog);
+          setCurrentResult(addedData);
           // ログに最新の結果をunshift
-          log.unshift(addedData.diceLog);
+          log.unshift(addedData);
           setResultLog(log);
         }
       });
@@ -111,14 +114,14 @@ const App: React.FC = () => {
         を振りました:{' '}
       </div>
       <div className="singleResult">
-        {currentResult.dice.single.map((single) => (
+        {currentResult.dice.single.map((single: string) => (
           <p className="singleResult__num">{single}</p>
         ))}
       </div>
       <p className="result">{currentResult.dice.last}</p>
       <div className="log">
         <p>ログ: </p>
-        {resultLog.map((log) => (
+        {resultLog.map((log: Result) => (
           <p>
             [{log.timestamp}] {log.playerName} さんが {log.dice.type} で{' '}
             {log.dice.last} を出しました
