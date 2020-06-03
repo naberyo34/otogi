@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { firestore } from './services/firebase';
-import './App.css';
 import diceRoll, { DiceResult } from './services/diceRoll';
 import formatDate from './services/formatDate';
 
