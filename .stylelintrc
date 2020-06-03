@@ -1,0 +1,14 @@
+{
+  "processors": [
+    "stylelint-processor-styled-components"
+  ],
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-recess-order",
+    "stylelint-config-styled-components",
+    "stylelint-config-prettier"
+  ],
+  "plugins": [
+    "stylelint-order"
+  ]
+}
