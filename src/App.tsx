@@ -82,7 +82,7 @@ const App: React.FC = () => {
           const sound: HTMLMediaElement | null = document.querySelector(
             '.js-sound'
           );
-          sound?.play();
+          if (sound) sound.play();
           setTimeout(() => setRolling(false), 1000);
           const addedData: firebase.firestore.DocumentData = change.doc.data();
           const log = resultLog;
@@ -101,7 +101,9 @@ const App: React.FC = () => {
       <h1>otogi ver0.1</h1>
       <div>
         <span>ダイスの音量調整はここからどうぞ</span>
-        <audio src="./diceroll.mp3" controls className="js-sound" />
+        <audio src="./diceroll.mp3" controls className="js-sound">
+          <track default kind="captions" label="ダイスロールの効果音" />
+        </audio>
       </div>
       <select onChange={handleChooseDiceCount}>
         <option value="1">1</option>
@@ -116,9 +118,9 @@ const App: React.FC = () => {
         <option value="4">4</option>
         <option value="3">3</option>
       </select>
-      <label>
+      <label htmlFor="myName">
         あなたの名前:
-        <input type="text" onChange={(e) => handleInputMyName(e)} />
+        <input type="text" onChange={(e) => handleInputMyName(e)} id="myName" />
       </label>
       <button
         type="button"
@@ -134,7 +136,9 @@ const App: React.FC = () => {
       {!isRolling && (
         <div className="singleResult">
           {currentResult.dice.single.map((single: string) => (
-            <p className="singleResult__num">{single}</p>
+            <p className="singleResult__num" key={single}>
+              {single}
+            </p>
           ))}
         </div>
       )}
@@ -142,7 +146,7 @@ const App: React.FC = () => {
       <div className="log">
         <p>ログ: </p>
         {resultLog.map((log: Result) => (
-          <p>
+          <p key={log.timestamp}>
             [{log.timestamp}] {log.playerName} さんが {log.dice.type} で{' '}
             {log.dice.last} を出しました
           </p>

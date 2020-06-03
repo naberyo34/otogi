@@ -12,7 +12,11 @@ export interface DiceResult {
  */
 const diceRoll = (count: number, size: number): DiceResult => {
   let roll = 0;
-  let diceResult: DiceResult = { type: `${count}D${size}`, single: [], last: 0 };
+  const diceResult: DiceResult = {
+    type: `${count}D${size}`,
+    single: [],
+    last: 0,
+  };
 
   while (roll < count) {
     // 1以上size以下の乱数を生成
@@ -22,7 +26,7 @@ const diceRoll = (count: number, size: number): DiceResult => {
     diceResult.single.push(currentResult);
     diceResult.last += currentResult;
 
-    roll++;
+    roll += 1;
   }
 
   return diceResult;
