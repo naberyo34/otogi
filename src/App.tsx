@@ -215,7 +215,7 @@ const App: React.FC = () => {
           setRolling(true);
           // サウンドを再生
           const sound: HTMLMediaElement | null = document.querySelector(
-            '.js-sound'
+            '#js-sound'
           );
           if (sound) sound.play();
           setTimeout(() => setRolling(false), 1000);

@@ -8,7 +8,7 @@ const Wrapper = styled.section`
 const Sound: React.FC = () => (
   <Wrapper>
     <p>ダイスの音量チェックはここからどうぞ</p>
-    <audio src="./diceroll.mp3" controls className="js-sound">
+    <audio src="./diceroll.mp3" controls id="js-sound">
       <track default kind="captions" label="ダイスロールの効果音" />
     </audio>
   </Wrapper>
