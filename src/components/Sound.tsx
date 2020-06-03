@@ -8,9 +8,8 @@ const Wrapper = styled.section`
 const Sound: React.FC = () => (
   <Wrapper>
     <p>ダイスの音量チェックはここからどうぞ</p>
-    <audio src="./diceroll.wav" controls id="js-sound">
-      <track default kind="captions" label="ダイスロールの効果音" />
-    </audio>
+    {/* eslint-disable-next-line */}
+    <audio src="./diceroll.wav" controls id="js-sound" />
   </Wrapper>
 );
 
