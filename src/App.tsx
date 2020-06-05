@@ -60,8 +60,9 @@ const DiceRoll = styled.div`
     background: red;
     border-radius: 8px;
 
-    &:hover {
-      opacity: 0.6;
+    &:disabled {
+      cursor: wait;
+      opacity: 0.2;
     }
   }
 `;
