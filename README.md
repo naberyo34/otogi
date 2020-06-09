@@ -1,4 +1,5 @@
 # otogi
+![otogi](https://user-images.githubusercontent.com/39970521/83837458-723c1e00-a731-11ea-8e77-fa1c6511b40b.png)
 ## 概要
 - オンラインでのTRPGを楽しむツールです。
 - 徐々に機能追加していく、かも。
