@@ -5,6 +5,7 @@ import CharacterMaker from './pages/CharacterMaker';
 
 const App: React.FC = () => (
   <BrowserRouter>
+    <p>otogi v0.3alpha 完全に開発中なので色々おかしいです</p>
     <ul>
       <li>
         <Link to="/realtime-dice">リアルタイムダイス</Link>

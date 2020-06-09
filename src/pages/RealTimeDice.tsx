@@ -28,10 +28,6 @@ const Inner = styled.div`
   padding: 16px;
 `;
 
-const Title = styled.h1`
-  font-size: 1.6rem;
-`;
-
 const DiceSetting = styled.div`
   margin-top: 16px;
   text-align: center;
@@ -239,7 +235,6 @@ const RealTimeDice: React.FC = () => {
   return (
     <Wrapper>
       <Inner>
-        <Title>otogi v0.2</Title>
         <DiceSetting>
           <Select onChange={handleChooseDiceCount}>
             <option value="1">1</option>
