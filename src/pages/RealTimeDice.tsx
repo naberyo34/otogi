@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { firestore } from './services/firebase';
-import Sound from './components/Sound';
-import diceRoll, { DiceResult } from './services/diceRoll';
-import formatDate from './services/formatDate';
-import { State } from './modules/index';
-import toggleLog from './modules/realTimeDice/actions';
+import { firestore } from '../services/firebase';
+import Sound from '../components/Sound';
+import diceRoll, { DiceResult } from '../services/diceRoll';
+import formatDate from '../services/formatDate';
+import { State } from '../modules/index';
+import toggleLog from '../modules/realTimeDice/actions';
 
 interface Result {
   playerName: string;

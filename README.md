@@ -12,6 +12,5 @@
 - TypeScript
 - React (Hooks)
 - Redux, React-Redux
+- React Router
 - Firebase
-### メモ
-- Routerとかは必要になってからでいいです。最小構成。
