@@ -7,6 +7,8 @@
 - リアルタイムダイスロール
 ## 開発コマンド
 - `yarn start`でプレビュー起動。
+- `yarn build`で`build`フォルダへのビルド。
+- `firebase deploy --only hosting`で`build`フォルダをデプロイ。
 ## 技術
 - TypeScript
 - React (Hooks)
