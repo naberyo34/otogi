@@ -56,13 +56,12 @@ const DiceRoll = styled.div`
     padding: 8px;
     color: white;
     cursor: pointer;
-    background: red;
+    background: black;
     border-radius: 8px;
 
-    &:hover {
-      opacity: 0.6;
+    &:first-child {
+      background: red;
     }
-  }
 `;
 
 const Info = styled.p`
@@ -72,6 +71,13 @@ const Info = styled.p`
 const ResultDisplay = styled.div`
   margin-top: 32px;
   text-align: center;
+`;
+
+const LocalResultDisplay = styled.div`
+  margin-top: 32px;
+  color: white;
+  text-align: center;
+  background: black;
 `;
 
 const SingleDisplay = styled.div<StyledProps>`
@@ -158,6 +164,7 @@ const RealTimeDice: React.FC = () => {
     },
     timestamp: '',
   });
+  const [localResult, setLocalResult] = useState<Result | false>(false);
   const [resultLog, setResultLog] = useState<firebase.firestore.DocumentData>(
     []
   );
@@ -195,6 +202,60 @@ const RealTimeDice: React.FC = () => {
       dice,
       timestamp: currentDate,
     });
+  };
+
+  const handleHiddenDiceRoll = () => {
+    if (!myName) {
+      alert('名前を入れてください');
+      return;
+    }
+
+    const dice = diceRoll(Number(diceCount.value), Number(diceSize.value));
+    const currentDate = formatDate(new Date());
+
+    const addedData: Result = {
+      playerName: myName,
+      dice,
+      timestamp: currentDate,
+    };
+
+    // firestoreには出目を隠して情報を送信する
+    firestore.collection('result').add({
+      playerName: myName,
+      dice: {
+        type: '何か',
+        single: ['????'],
+        last: '????',
+      },
+      timestamp: currentDate,
+    });
+
+    // currentResultを最新の結果に更新 (自分のstateのみ)
+    setLocalResult(addedData);
+  };
+
+  const handleSilentDiceRoll = () => {
+    if (!myName) {
+      alert('名前を入れてください');
+      return;
+    }
+
+    const dice = diceRoll(Number(diceCount.value), Number(diceSize.value));
+    const currentDate = formatDate(new Date());
+
+    const addedData: Result = {
+      playerName: myName,
+      dice,
+      timestamp: currentDate,
+    };
+
+    // サウンドを再生
+    const sound: HTMLMediaElement | null = document.querySelector('#js-sound');
+    if (sound) sound.play();
+    setTimeout(() => setRolling(false), 1000);
+
+    // currentResultを最新の結果に更新 (自分のstateのみ)
+    setLocalResult(addedData);
   };
 
   // ログの開閉
@@ -264,14 +325,30 @@ const RealTimeDice: React.FC = () => {
           <button type="button" onClick={handleDiceRoll} disabled={isRolling}>
             ダイスロール!
           </button>
+          <p>↓振ったことは伝えますが、出目は自分以外に見えません</p>
+          <button
+            type="button"
+            onClick={handleHiddenDiceRoll}
+            disabled={isRolling}
+          >
+            出目を伏せてダイスロール!
+          </button>
+          <p>↓振ったことは自分にしかわかりません (ログも残りません)</p>
+          <button
+            type="button"
+            onClick={handleSilentDiceRoll}
+            disabled={isRolling}
+          >
+            こっそりダイスロール!
+          </button>
         </DiceRoll>
         <ResultDisplay>
           <Info>
-            {currentResult.playerName} さんが {currentResult.dice.type}
+            {currentResult.playerName} さんが {currentResult.dice.type}{' '}
             を振りました:
           </Info>
           <SingleDisplay isShow={!isRolling}>
-            {currentResult.dice.single.map((single: string) => (
+            {currentResult.dice.single.map((single: number) => (
               <span>{single}</span>
             ))}
           </SingleDisplay>
@@ -279,6 +356,22 @@ const RealTimeDice: React.FC = () => {
             {currentResult.dice.last}
           </CurrentDisplay>
         </ResultDisplay>
+        {localResult && (
+          <LocalResultDisplay>
+            <Info>
+              {localResult.playerName} さんが 非公開で {localResult.dice.type}{' '}
+              を振りました:
+            </Info>
+            <SingleDisplay isShow={!isRolling}>
+              {localResult.dice.single.map((single: number) => (
+                <span>{single}</span>
+              ))}
+            </SingleDisplay>
+            <CurrentDisplay isShow={!isRolling}>
+              {localResult.dice.last}
+            </CurrentDisplay>
+          </LocalResultDisplay>
+        )}
         <Sound />
       </Inner>
       <LogSwitch isShow={showLog} type="button" onClick={handleToggleLog}>
@@ -289,8 +382,8 @@ const RealTimeDice: React.FC = () => {
           {resultLog.map((log: Result) => (
             <p key={log.timestamp}>
               [{log.timestamp}]<br />
-              <PlayerName>{log.playerName}</PlayerName> さんが
-              {log.dice.type} で {log.dice.last} を出しました
+              <PlayerName>{log.playerName}</PlayerName> さんが {log.dice.type}{' '}
+              で {log.dice.last} を出しました
             </p>
           ))}
         </LogInner>
