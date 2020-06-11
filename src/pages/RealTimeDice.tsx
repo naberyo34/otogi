@@ -59,9 +59,15 @@ const DiceRoll = styled.div`
     background: black;
     border-radius: 8px;
 
+    &:disabled {
+      cursor: wait;
+      opacity: 0.2;
+    }
+
     &:first-child {
       background: red;
     }
+  }
 `;
 
 const Info = styled.p`
