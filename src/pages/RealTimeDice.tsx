@@ -122,7 +122,7 @@ const CurrentDisplay = styled.span<StyledProps>`
 
 const LogSwitch = styled.button<StyledProps>`
   position: fixed;
-  bottom: ${(props) => (props.isShow ? '160px' : '0')};
+  bottom: ${(props) => (props.isShow ? '320px' : '0')};
   left: 0;
   padding: 8px;
   color: white;
@@ -132,12 +132,12 @@ const LogSwitch = styled.button<StyledProps>`
 
 const LogWrapper = styled.div<StyledProps>`
   position: fixed;
-  bottom: ${(props) => (props.isShow ? '0' : '-160px')};
+  bottom: ${(props) => (props.isShow ? '0' : '-320px')};
   left: 0;
   display: flex;
   justify-content: center;
   width: 100vw;
-  height: 160px;
+  height: 320px;
   background: rgba(0, 0, 0, 0.6);
   transition: bottom 0.2s;
 `;
