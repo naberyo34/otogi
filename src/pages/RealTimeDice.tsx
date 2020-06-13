@@ -17,6 +17,7 @@ interface Result {
 
 interface StyledProps {
   isShow: boolean;
+  emphasis?: boolean;
 }
 
 const Wrapper = styled.section`
@@ -166,6 +167,7 @@ const PlayerName = styled.span`
 
 const Success = styled.p<StyledProps>`
   font-size: 3rem;
+  color: ${(props) => (props.emphasis ? 'red' : 'black')};
   visibility: ${(props) => (props.isShow ? 'visible' : 'hidden')};
   opacity: ${(props) => (props.isShow ? '1' : '0')};
 `;
@@ -495,7 +497,13 @@ const RealTimeDice: React.FC = () => {
             {currentResult.dice.last}
           </CurrentDisplay>
           {currentResult.success && (
-            <Success isShow={!rollingGlobal}>
+            <Success
+              isShow={!rollingGlobal}
+              emphasis={
+                currentResult.success === 'クリティカル' ||
+                currentResult.success === 'ファンブル'
+              }
+            >
               判定: {currentResult.success}
             </Success>
           )}
