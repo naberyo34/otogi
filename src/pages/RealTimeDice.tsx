@@ -11,6 +11,7 @@ import toggleLog from '../modules/realTimeDice/actions';
 interface Result {
   playerName: string;
   dice: DiceResult | HiddenDiceResult;
+  success?: string;
   timestamp: string;
 }
 
@@ -42,9 +43,13 @@ const SelectLabel = styled.span`
   font-size: 2.4rem;
 `;
 
-const NameSetting = styled.div`
+const InputArea = styled.div`
   margin-top: 16px;
   text-align: center;
+
+  label {
+    font-size: 1.6rem;
+  }
 `;
 
 const DiceRoll = styled.div`
@@ -196,9 +201,29 @@ const RealTimeDice: React.FC = () => {
   const makeResult = (): Result => {
     const dice = diceRoll(Number(diceCount.value), Number(diceSize.value));
     const currentDate = formatDate(new Date());
+
+    // 成功判定値が0 (未定義) の場合、判定は入れずに結果を返す
+    if (successNum === 0) {
+      const newResult: Result = {
+        playerName: myName,
+        dice,
+        timestamp: currentDate,
+      };
+
+      return newResult;
+    }
+
+    // 成功判定値が設定されている場合、判定を入れて結果を返す
+    let success = dice.last < successNum ? '成功' : '失敗';
+
+    // もしクリティカルかファンブルが出ているなら、その結果を返す
+    if (dice.type === '1D100' && dice.last <= 5) success = 'クリティカル';
+    if (dice.type === '1D100' && dice.last >= 96) success = 'ファンブル';
+
     const newResult: Result = {
       playerName: myName,
       dice,
+      success,
       timestamp: currentDate,
     };
 
@@ -273,9 +298,16 @@ const RealTimeDice: React.FC = () => {
     }
 
     const newResult = makeResult();
+    const successNumDOM: HTMLInputElement | null = document.querySelector(
+      '#js-successNum'
+    );
 
     // 結果をfirestoreに追加
     firestore.collection('result').add(newResult);
+
+    // 成功判定値欄を0に戻す
+    setSuccessNum(0);
+    if (successNumDOM) successNumDOM.value = '';
   };
 
   // 出目を伏せてダイスロール
@@ -294,8 +326,12 @@ const RealTimeDice: React.FC = () => {
     const hiddenResult: Result = {
       playerName: newResult.playerName,
       dice: hiddenDiceResult,
+      success: '????',
       timestamp: newResult.timestamp,
     };
+    const successNumDOM: HTMLInputElement | null = document.querySelector(
+      '#js-successNum'
+    );
 
     // 出目を隠してfirestoreに送信する
     firestore.collection('result').add(hiddenResult);
@@ -303,6 +339,10 @@ const RealTimeDice: React.FC = () => {
     // localResultにのみ結果を表示
     // TODO: いくらなんでもこのsetTimeoutはお粗末すぎる
     setTimeout(() => setLocalResult(newResult), 500);
+
+    // 成功判定値欄を0に戻す
+    setSuccessNum(0);
+    if (successNumDOM) successNumDOM.value = '';
   };
 
   // ローカルダイスロール
@@ -313,11 +353,18 @@ const RealTimeDice: React.FC = () => {
     }
 
     const newResult = makeResult();
+    const successNumDOM: HTMLInputElement | null = document.querySelector(
+      '#js-successNum'
+    );
 
     // ダイス演出
     dicePerformance('local');
     // localResultにのみ結果を表示
     setLocalResult(newResult);
+
+    // 成功判定値欄を0に戻す
+    setSuccessNum(0);
+    if (successNumDOM) successNumDOM.value = '';
   };
 
   // ログの開閉
@@ -381,22 +428,30 @@ const RealTimeDice: React.FC = () => {
             <option value="2">2</option>
           </Select>
         </DiceSetting>
-        <NameSetting>
+        <InputArea>
           <label htmlFor="myName">
             あなたの名前:
             <input
+              id="myName"
               type="text"
               onChange={(e) => handleInputMyName(e)}
-              id="myName"
             />
           </label>
-        </NameSetting>
-        <p>成功判定値(0の場合は特に判定しません)</p>
-        <input
-          type="tel"
-          maxLength={2}
-          onChange={(e) => handleInputSucessNum(e)}
-        />
+        </InputArea>
+        <InputArea>
+          <label htmlFor="js-successNum">
+            成功判定値(1 〜 99):
+            <input
+              id="js-successNum"
+              type="tel"
+              maxLength={2}
+              onChange={(e) => handleInputSucessNum(e)}
+            />
+          </label>
+        </InputArea>
+        <p>
+          未入力の場合は特に判定しません。1度ダイスを振ると未入力に戻ります。
+        </p>
         <DiceRoll>
           <button
             type="button"
@@ -439,15 +494,10 @@ const RealTimeDice: React.FC = () => {
           <CurrentDisplay isShow={!rollingGlobal}>
             {currentResult.dice.last}
           </CurrentDisplay>
-          <p>
-            成功判定(beta)
-            現状ローカルでしか表示されないので他人から見えないです
-          </p>
-          {currentResult.dice.last < successNum && (
-            <Success isShow={!rollingGlobal}>成功</Success>
-          )}
-          {successNum !== 0 && currentResult.dice.last > successNum && (
-            <Success isShow={!rollingGlobal}>失敗</Success>
+          {currentResult.success && (
+            <Success isShow={!rollingGlobal}>
+              判定: {currentResult.success}
+            </Success>
           )}
         </ResultDisplay>
         {localResult && (
@@ -468,6 +518,11 @@ const RealTimeDice: React.FC = () => {
             <CurrentDisplay isShow={!rollingLocal}>
               {localResult.dice.last}
             </CurrentDisplay>
+            {localResult.success && (
+              <Success isShow={!rollingLocal}>
+                判定: {localResult.success}
+              </Success>
+            )}
           </LocalResultDisplay>
         )}
         <Sound />
@@ -481,7 +536,8 @@ const RealTimeDice: React.FC = () => {
             <p key={log.timestamp}>
               [{log.timestamp}]<br />
               <PlayerName>{log.playerName}</PlayerName> さんが {log.dice.type}{' '}
-              で {log.dice.last} を出しました
+              で {log.dice.last} を出しました。
+              {log.success && log.success !== '????' && `${log.success}です。`}
             </p>
           ))}
         </LogInner>
