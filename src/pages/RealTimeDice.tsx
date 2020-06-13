@@ -159,15 +159,22 @@ const PlayerName = styled.span`
   color: red;
 `;
 
+const Success = styled.p<StyledProps>`
+  font-size: 3rem;
+  visibility: ${(props) => (props.isShow ? 'visible' : 'hidden')};
+  opacity: ${(props) => (props.isShow ? '1' : '0')};
+`;
+
 const RealTimeDice: React.FC = () => {
   const dispatch = useDispatch();
   const [rollingGlobal, setRollingGlobal] = useState<boolean>(false);
   const [rollingLocal, setRollingLocal] = useState<boolean>(false);
   // const [showLog, setshowLog] = useState<boolean>(false);
   const showLog = useSelector((state: State) => state.realTimeDice.log.isShow);
-  const [myName, setMyName] = useState('');
+  const [myName, setMyName] = useState<string>('');
   const [diceCount, setDiceCount] = useState({ value: '1' });
   const [diceSize, setDiceSize] = useState({ value: '100' });
+  const [successNum, setSuccessNum] = useState<number>(0);
   // TODO: firebaseのDocumentData型とResult型を併用する方法が不明 気に入らない
   const [currentResult, setCurrentResult] = useState<
     firebase.firestore.DocumentData
@@ -240,6 +247,22 @@ const RealTimeDice: React.FC = () => {
   const handleInputMyName = (e: any) => {
     const inputName = e.target.value;
     setMyName(inputName);
+  };
+
+  const handleInputSucessNum = (e: any) => {
+    const inputValue: string = e.target.value;
+    // 空欄にした場合は特に何もせずに終了する
+    if (inputValue === '') return;
+
+    const inputNum = parseInt(inputValue, 10);
+    // バリデーション
+    if (Number.isNaN(inputNum)) {
+      alert('入力値が不正です。数値のみが入力できます');
+      setSuccessNum(0);
+      return;
+    }
+
+    setSuccessNum(inputNum);
   };
 
   // グローバルダイスロール
@@ -368,6 +391,12 @@ const RealTimeDice: React.FC = () => {
             />
           </label>
         </NameSetting>
+        <p>成功判定値(0の場合は特に判定しません)</p>
+        <input
+          type="tel"
+          maxLength={2}
+          onChange={(e) => handleInputSucessNum(e)}
+        />
         <DiceRoll>
           <button
             type="button"
@@ -410,6 +439,16 @@ const RealTimeDice: React.FC = () => {
           <CurrentDisplay isShow={!rollingGlobal}>
             {currentResult.dice.last}
           </CurrentDisplay>
+          <p>
+            成功判定(beta)
+            現状ローカルでしか表示されないので他人から見えないです
+          </p>
+          {currentResult.dice.last < successNum && (
+            <Success isShow={!rollingGlobal}>成功</Success>
+          )}
+          {successNum !== 0 && currentResult.dice.last > successNum && (
+            <Success isShow={!rollingGlobal}>失敗</Success>
+          )}
         </ResultDisplay>
         {localResult && (
           <LocalResultDisplay>
