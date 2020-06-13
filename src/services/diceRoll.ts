@@ -4,6 +4,12 @@ export interface DiceResult {
   last: number;
 }
 
+export interface HiddenDiceResult {
+  type: '何か';
+  single: '????';
+  last: '????';
+}
+
 /**
  * 任意の面数、任意の個数でダイスロールを行う
  * @returns diceResult 結果の値
