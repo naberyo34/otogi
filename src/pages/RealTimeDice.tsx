@@ -399,6 +399,8 @@ const RealTimeDice: React.FC = () => {
         }
       });
     });
+    // TODO: useEffectは一回発火すれば十分なので今の所こう書いてる
+    // eslint-disable-next-line
   }, []);
 
   return (

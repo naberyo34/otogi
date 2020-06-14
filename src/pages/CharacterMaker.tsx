@@ -1,6 +1,9 @@
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { firestore } from '../services/firebase';
+import { editCharacterStatus } from '../modules/characterMaker/actions';
+import { State } from '../modules/index';
 import InputCharacterParams from '../components/characterMaker/InputCharacterParams';
 
 const Wrapper = styled.section`
@@ -11,10 +14,22 @@ const Wrapper = styled.section`
 const StatusArea = styled.textarea``;
 
 const CharacterMaker: React.FC = () => {
+  const dispatch = useDispatch();
+  const newCharacter = useSelector((state: State) => state.characterMaker);
+  // テキストエリアに入力した内容をStoreにも反映
+  const handleEditStatus = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    dispatch(editCharacterStatus(e.target.value));
+  };
+  // Storeの情報をFirestoreに送信する
   const handleSubmit = (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
     e.preventDefault();
     // キャラクターをfirestoreに追加
-    // firestore.collection('character').add(newResult);
+    firestore
+      .collection('character')
+      .add(newCharacter)
+      .then(() => {
+        alert('送信に成功しました');
+      });
   };
 
   return (
@@ -33,7 +48,13 @@ const CharacterMaker: React.FC = () => {
         </label>
         <InputCharacterParams />
         <span>ステータス:</span>
-        <StatusArea id="status" cols={100} rows={4} placeholder="自由記述" />
+        <StatusArea
+          id="status"
+          cols={100}
+          rows={4}
+          placeholder="自由記述"
+          onChange={(e) => handleEditStatus(e)}
+        />
         <input type="submit" value="作成!" onClick={(e) => handleSubmit(e)} />
       </form>
     </Wrapper>

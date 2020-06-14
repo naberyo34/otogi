@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import abilities from '../../services/abilities';
-import changeCharacterParams from '../../modules/characterMaker/actions';
+import { editCharacterParams } from '../../modules/characterMaker/actions';
 
 const Wrapper = styled.section`
   margin-top: 32px;
@@ -20,7 +20,7 @@ const InputCharacterParams: React.FC = () => {
       [targetLabel]: parseInt(targetNum, 10),
     };
 
-    dispatch(changeCharacterParams(changeParam));
+    dispatch(editCharacterParams(changeParam));
   };
 
   /**

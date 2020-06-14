@@ -11,6 +11,7 @@ export interface CharacterMakerState {
   siz: number;
   int: number;
   edu: number;
+  status: string;
 }
 
 // stateの初期化
@@ -23,6 +24,7 @@ const initialState: CharacterMakerState = {
   siz: 8,
   int: 8,
   edu: 6,
+  status: '',
 };
 
 // Reducerの定義
@@ -31,10 +33,18 @@ const characterMaker = (
   action: Action
 ): CharacterMakerState => {
   switch (action.type) {
-    case types.CHANGE_CHARACTER_PARAMS: {
+    // STRなどの値を変更したとき
+    case types.EDIT_CHARACTER_PARAMS: {
       return {
         ...state,
         ...action.payload,
+      };
+    }
+    // テキストエリアに入力したとき
+    case types.EDIT_CHARACTER_STATUS: {
+      return {
+        ...state,
+        status: action.payload,
       };
     }
     default:
