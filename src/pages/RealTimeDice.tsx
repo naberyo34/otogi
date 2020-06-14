@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { firestore } from '../services/firebase';
-import Sound from '../components/Sound';
+import Sound from '../components/realTimeDice/Sound';
 import diceRoll, { DiceResult, HiddenDiceResult } from '../services/diceRoll';
 import formatDate from '../services/formatDate';
 import generateRandomId from '../services/generateRandomId';
@@ -23,13 +23,9 @@ interface StyledProps {
 }
 
 const Wrapper = styled.section`
-  display: flex;
-  justify-content: center;
-`;
-
-const Inner = styled.div`
   width: 320px;
   padding: 16px;
+  border-right: 1px solid black;
 `;
 
 const DiceSetting = styled.div`
@@ -151,7 +147,6 @@ const LogWrapper = styled.div<StyledProps>`
 `;
 
 const LogInner = styled.div`
-  width: 320px;
   padding: 16px;
   overflow-y: scroll;
   font-size: 1.6rem;
@@ -408,136 +403,133 @@ const RealTimeDice: React.FC = () => {
 
   return (
     <Wrapper>
-      <Inner>
-        <DiceSetting>
-          <Select onChange={handleChooseDiceCount}>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-          </Select>
-          <SelectLabel>D</SelectLabel>
-          <Select onChange={handleChooseDiceSize}>
-            <option value="100">100</option>
-            <option value="20">20</option>
-            <option value="10">10</option>
-            <option value="9">9</option>
-            <option value="8">8</option>
-            <option value="7">7</option>
-            <option value="6">6</option>
-            <option value="5">5</option>
-            <option value="4">4</option>
-            <option value="3">3</option>
-            <option value="2">2</option>
-          </Select>
-        </DiceSetting>
-        <InputArea>
-          <label htmlFor="myName">
-            あなたの名前:
-            <input
-              id="myName"
-              type="text"
-              onChange={(e) => handleInputMyName(e)}
-            />
-          </label>
-        </InputArea>
-        <InputArea>
-          <label htmlFor="js-successNum">
-            成功判定値(1 〜 99):
-            <input
-              id="js-successNum"
-              type="tel"
-              maxLength={2}
-              onChange={(e) => handleInputSucessNum(e)}
-            />
-          </label>
-        </InputArea>
-        <p>
-          未入力の場合は特に判定しません。1度ダイスを振ると未入力に戻ります。
-        </p>
-        <DiceRoll>
-          <button
-            type="button"
-            onClick={handleGlobalDiceRoll}
-            disabled={rollingGlobal || rollingLocal}
+      <DiceSetting>
+        <Select onChange={handleChooseDiceCount}>
+          {/* TODO: なんのためのJSだ 省略して書け */}
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+        </Select>
+        <SelectLabel>D</SelectLabel>
+        <Select onChange={handleChooseDiceSize}>
+          <option value="100">100</option>
+          <option value="20">20</option>
+          <option value="10">10</option>
+          <option value="9">9</option>
+          <option value="8">8</option>
+          <option value="7">7</option>
+          <option value="6">6</option>
+          <option value="5">5</option>
+          <option value="4">4</option>
+          <option value="3">3</option>
+          <option value="2">2</option>
+        </Select>
+      </DiceSetting>
+      <InputArea>
+        <label htmlFor="myName">
+          あなたの名前:
+          <input
+            id="myName"
+            type="text"
+            onChange={(e) => handleInputMyName(e)}
+          />
+        </label>
+      </InputArea>
+      <InputArea>
+        <label htmlFor="js-successNum">
+          成功判定値(1 〜 99):
+          <input
+            id="js-successNum"
+            type="tel"
+            maxLength={2}
+            onChange={(e) => handleInputSucessNum(e)}
+          />
+        </label>
+      </InputArea>
+      <p>未入力の場合は特に判定しません。1度ダイスを振ると未入力に戻ります。</p>
+      <DiceRoll>
+        <button
+          type="button"
+          onClick={handleGlobalDiceRoll}
+          disabled={rollingGlobal || rollingLocal}
+        >
+          ダイスロール!
+        </button>
+        <p>↓振ったことは伝えますが、出目は自分以外に見えません</p>
+        <button
+          type="button"
+          onClick={handleHidingDiceRoll}
+          disabled={rollingGlobal || rollingLocal}
+        >
+          出目を伏せてダイスロール!
+        </button>
+        <p>↓振ったことは自分にしかわかりません (ログも残りません)</p>
+        <button
+          type="button"
+          onClick={handleLocalDiceRoll}
+          disabled={rollingGlobal || rollingLocal}
+        >
+          こっそりダイスロール!
+        </button>
+      </DiceRoll>
+      <ResultDisplay>
+        <Info>
+          {currentResult.playerName} さんが {currentResult.dice.type}{' '}
+          を振りました:
+        </Info>
+        <SingleDisplay isShow={!rollingGlobal}>
+          {Array.isArray(currentResult.dice.single) ? (
+            currentResult.dice.single.map((single: number | string) => (
+              <span key={generateRandomId(8)}>{single}</span>
+            ))
+          ) : (
+            <span>{currentResult.dice.single}</span>
+          )}
+        </SingleDisplay>
+        <CurrentDisplay isShow={!rollingGlobal}>
+          {currentResult.dice.last}
+        </CurrentDisplay>
+        {currentResult.success && (
+          <Success
+            isShow={!rollingGlobal}
+            emphasis={
+              currentResult.success === 'クリティカル' ||
+              currentResult.success === 'ファンブル'
+            }
           >
-            ダイスロール!
-          </button>
-          <p>↓振ったことは伝えますが、出目は自分以外に見えません</p>
-          <button
-            type="button"
-            onClick={handleHidingDiceRoll}
-            disabled={rollingGlobal || rollingLocal}
-          >
-            出目を伏せてダイスロール!
-          </button>
-          <p>↓振ったことは自分にしかわかりません (ログも残りません)</p>
-          <button
-            type="button"
-            onClick={handleLocalDiceRoll}
-            disabled={rollingGlobal || rollingLocal}
-          >
-            こっそりダイスロール!
-          </button>
-        </DiceRoll>
-        <ResultDisplay>
+            判定: {currentResult.success}
+          </Success>
+        )}
+      </ResultDisplay>
+      {localResult && (
+        <LocalResultDisplay>
           <Info>
-            {currentResult.playerName} さんが {currentResult.dice.type}{' '}
+            {localResult.playerName} さんが 非公開で {localResult.dice.type}{' '}
             を振りました:
           </Info>
-          <SingleDisplay isShow={!rollingGlobal}>
-            {Array.isArray(currentResult.dice.single) ? (
-              currentResult.dice.single.map((single: number | string) => (
+          <SingleDisplay isShow={!rollingLocal}>
+            {Array.isArray(localResult.dice.single) ? (
+              localResult.dice.single.map((single: number | string) => (
                 <span key={generateRandomId(8)}>{single}</span>
               ))
             ) : (
-              <span>{currentResult.dice.single}</span>
+              <span>{localResult.dice.single}</span>
             )}
           </SingleDisplay>
-          <CurrentDisplay isShow={!rollingGlobal}>
-            {currentResult.dice.last}
+          <CurrentDisplay isShow={!rollingLocal}>
+            {localResult.dice.last}
           </CurrentDisplay>
-          {currentResult.success && (
-            <Success
-              isShow={!rollingGlobal}
-              emphasis={
-                currentResult.success === 'クリティカル' ||
-                currentResult.success === 'ファンブル'
-              }
-            >
-              判定: {currentResult.success}
+          {localResult.success && (
+            <Success isShow={!rollingLocal}>
+              判定: {localResult.success}
             </Success>
           )}
-        </ResultDisplay>
-        {localResult && (
-          <LocalResultDisplay>
-            <Info>
-              {localResult.playerName} さんが 非公開で {localResult.dice.type}{' '}
-              を振りました:
-            </Info>
-            <SingleDisplay isShow={!rollingLocal}>
-              {Array.isArray(localResult.dice.single) ? (
-                localResult.dice.single.map((single: number | string) => (
-                  <span key={generateRandomId(8)}>{single}</span>
-                ))
-              ) : (
-                <span>{localResult.dice.single}</span>
-              )}
-            </SingleDisplay>
-            <CurrentDisplay isShow={!rollingLocal}>
-              {localResult.dice.last}
-            </CurrentDisplay>
-            {localResult.success && (
-              <Success isShow={!rollingLocal}>
-                判定: {localResult.success}
-              </Success>
-            )}
-          </LocalResultDisplay>
-        )}
-        <Sound />
-      </Inner>
+        </LocalResultDisplay>
+      )}
+      <Sound />
       <LogSwitch isShow={showLog} type="button" onClick={handleToggleLog}>
         ログ
       </LogSwitch>
