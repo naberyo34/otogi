@@ -5,10 +5,12 @@ import { firestore } from '../services/firebase';
 import Sound from '../components/Sound';
 import diceRoll, { DiceResult, HiddenDiceResult } from '../services/diceRoll';
 import formatDate from '../services/formatDate';
+import generateRandomId from '../services/generateRandomId';
 import { State } from '../modules/index';
 import toggleLog from '../modules/realTimeDice/actions';
 
 interface Result {
+  id?: string;
   playerName: string;
   dice: DiceResult | HiddenDiceResult;
   success?: string;
@@ -382,22 +384,23 @@ const RealTimeDice: React.FC = () => {
 
     queryCollection.onSnapshot((querySnapshot) => {
       querySnapshot.docChanges().forEach((change) => {
+        // Firestoreにデータが追加されたとき (※アプリ起動時にも発火する)
         if (change.type === 'added') {
-          const newResult: firebase.firestore.DocumentData = change.doc.data();
-          const log = resultLog;
+          const rawData: firebase.firestore.DocumentData = change.doc.data();
+          const currentLog = resultLog;
 
-          // ダイス演出
-          if (newResult.dice.type === '何か') {
+          // ダイス演出を行う
+          if (rawData.dice.type === '何か') {
             dicePerformance('hiding');
           } else {
             dicePerformance('global');
           }
 
           // currentResultを最新の結果に更新
-          setCurrentResult(newResult);
-          // ログに最新の結果をunshift
-          log.unshift(newResult);
-          setResultLog(log);
+          setCurrentResult(rawData);
+          // ログに最新の結果をunshiftしてstateを更新
+          currentLog.unshift(rawData);
+          setResultLog(currentLog);
         }
       });
     });
@@ -487,7 +490,7 @@ const RealTimeDice: React.FC = () => {
           <SingleDisplay isShow={!rollingGlobal}>
             {Array.isArray(currentResult.dice.single) ? (
               currentResult.dice.single.map((single: number | string) => (
-                <span>{single}</span>
+                <span key={generateRandomId(8)}>{single}</span>
               ))
             ) : (
               <span>{currentResult.dice.single}</span>
@@ -517,7 +520,7 @@ const RealTimeDice: React.FC = () => {
             <SingleDisplay isShow={!rollingLocal}>
               {Array.isArray(localResult.dice.single) ? (
                 localResult.dice.single.map((single: number | string) => (
-                  <span>{single}</span>
+                  <span key={generateRandomId(8)}>{single}</span>
                 ))
               ) : (
                 <span>{localResult.dice.single}</span>
@@ -541,7 +544,7 @@ const RealTimeDice: React.FC = () => {
       <LogWrapper isShow={showLog}>
         <LogInner>
           {resultLog.map((log: Result) => (
-            <p key={log.timestamp}>
+            <p key={generateRandomId(8)}>
               [{log.timestamp}]<br />
               <PlayerName>{log.playerName}</PlayerName> さんが {log.dice.type}{' '}
               で {log.dice.last} を出しました。
