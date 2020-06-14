@@ -13,7 +13,7 @@ export const editCharacterParams = (payload: any): Action => ({
   payload,
 });
 
-export const editCharacterStatus = (payload: string): Action => ({
-  type: types.EDIT_CHARACTER_STATUS,
+export const editCharacterText = (payload: any): Action => ({
+  type: types.EDIT_CHARACTER_TEXT,
   payload,
 });

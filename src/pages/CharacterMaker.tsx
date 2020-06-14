@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { firestore } from '../services/firebase';
-import { editCharacterStatus } from '../modules/characterMaker/actions';
+import { editCharacterText } from '../modules/characterMaker/actions';
 import { State } from '../modules/index';
 import InputCharacterParams from '../components/characterMaker/InputCharacterParams';
 
@@ -17,11 +17,19 @@ const CharacterMaker: React.FC = () => {
   const dispatch = useDispatch();
   const newCharacter = useSelector((state: State) => state.characterMaker);
   // テキストエリアに入力した内容をStoreにも反映
-  const handleEditStatus = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    dispatch(editCharacterStatus(e.target.value));
+  const handleEditText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const targetText = e.target.value;
+    // MEMO: anyつけないと下記の'計算されたプロパティ名'が使えなくなる
+    // https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Operators/Object_initializer
+    const targetLabel: any = e.target.getAttribute('data-js-label');
+    const changeText = {
+      [targetLabel]: targetText,
+    };
+
+    dispatch(editCharacterText(changeText));
   };
   // Storeの情報をFirestoreに送信する
-  const handleSubmit = (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // キャラクターをfirestoreに追加
     firestore
@@ -41,21 +49,26 @@ const CharacterMaker: React.FC = () => {
         ※ここで入力するのは『初期能力値』です。増減等は別に編集機能を設ける予定。
       </p>
       <p>現状旧ルール仕様のみ対応</p>
-      <form>
+      <form onSubmit={(e) => handleSubmit(e)}>
         <label htmlFor="characterName">
           プレイヤー名:
-          <input id="characterName" type="text" placeholder="五味 葛男" />
+          <textarea
+            data-js-label="name"
+            id="characterName"
+            placeholder="五味 葛男"
+            onChange={(e) => handleEditText(e)}
+          />
         </label>
         <InputCharacterParams />
         <span>ステータス:</span>
         <StatusArea
-          id="status"
+          data-js-label="status"
           cols={100}
           rows={4}
           placeholder="自由記述"
-          onChange={(e) => handleEditStatus(e)}
+          onChange={(e) => handleEditText(e)}
         />
-        <input type="submit" value="作成!" onClick={(e) => handleSubmit(e)} />
+        <input type="submit" value="作成!" />
       </form>
     </Wrapper>
   );

@@ -11,9 +11,7 @@ const App: React.FC = () => (
         <Link to="/realtime-dice">リアルタイムダイス</Link>
       </li>
       <li>
-        <Link to="/character-maker">
-          キャラクターメーカー(まだ何もしてない)
-        </Link>
+        <Link to="/character-maker">キャラクターメーカー(alpha)</Link>
       </li>
     </ul>
     <Route path="/realtime-dice" component={RealTimeDice} />

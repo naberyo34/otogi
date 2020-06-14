@@ -3,6 +3,7 @@ import types from './actionTypes';
 
 // stateの型定義
 export interface CharacterMakerState {
+  name: string;
   str: number;
   con: number;
   pow: number;
@@ -16,6 +17,7 @@ export interface CharacterMakerState {
 
 // stateの初期化
 const initialState: CharacterMakerState = {
+  name: '',
   str: 3,
   con: 3,
   pow: 3,
@@ -41,10 +43,10 @@ const characterMaker = (
       };
     }
     // テキストエリアに入力したとき
-    case types.EDIT_CHARACTER_STATUS: {
+    case types.EDIT_CHARACTER_TEXT: {
       return {
         ...state,
-        status: action.payload,
+        ...action.payload,
       };
     }
     default:
