@@ -34,7 +34,7 @@ const InputCharacterParams: React.FC = () => {
     const options = [];
     let i = min;
 
-    while (i < max) {
+    while (i <= max) {
       options.push(
         <option key={`${i}`} value={`${i}`}>
           {i}
