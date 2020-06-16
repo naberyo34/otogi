@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { firestore } from '../services/firebase';
-import { editCharacterText } from '../modules/characterMaker/actions';
+import { setCharacterText } from '../modules/characterMaker/actions';
 import { State } from '../modules/index';
 import InputCharacterParams from '../components/characterMaker/InputCharacterParams';
 
@@ -26,7 +26,7 @@ const CharacterMaker: React.FC = () => {
       [targetLabel]: targetText,
     };
 
-    dispatch(editCharacterText(changeText));
+    dispatch(setCharacterText(changeText));
   };
   // Storeの情報をFirestoreに送信する
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

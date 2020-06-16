@@ -30,20 +30,6 @@ const Wrapper = styled.section`
   display: flex;
 `;
 
-const StatusWrapper = styled.section`
-  width: calc(100vw - 320px);
-  padding: 16px;
-`;
-
-const StatusCard = styled.div`
-  margin-top: 16px;
-  background: aliceblue;
-
-  p {
-    font-size: 1.6rem;
-  }
-`;
-
 const DiceWrapper = styled.section`
   width: 320px;
   padding: 16px;
@@ -193,6 +179,9 @@ const Success = styled.p<StyledProps>`
 
 const RealTimeDice: React.FC = () => {
   const dispatch = useDispatch();
+  const myCharacter = useSelector(
+    (state: State) => state.partyViewer.myCharacter
+  );
   const showLog = useSelector((state: State) => state.realTimeDice.log.isShow);
   // TODO: 全部Reduxに載せ替えろ どうせやらなくちゃいけないんだ
   const [rollingGlobal, setRollingGlobal] = useState<boolean>(false);
@@ -216,13 +205,6 @@ const RealTimeDice: React.FC = () => {
   const [resultLog, setResultLog] = useState<firebase.firestore.DocumentData>(
     []
   );
-  // TODO: 以下はCharacterPreview関連のStateです 切り分けろ
-  const [myCharacter, setMyCharacter] = useState<any>({});
-  const [characters, setCharacters] = useState<firebase.firestore.DocumentData>(
-    []
-  );
-  const [choosedViewCharacter, setChoosedViewCharacter] = useState<string>('');
-  const [viewCharacters, setViewCharacters] = useState<any[]>([]);
 
   /**
    * ダイス結果を生成
@@ -300,23 +282,6 @@ const RealTimeDice: React.FC = () => {
   const handleChooseDiceSize = (e: any) => {
     const size = e.target.value;
     setDiceSize({ value: size });
-  };
-
-  // 選択したキャラクターを使うよう設定
-  const handleChoosedMyCharacter = (e: any) => {
-    const choosedCharacterName = e.target.value;
-    const choosedCharacter = characters.find(
-      (character: any) => character.name === choosedCharacterName
-    );
-
-    // 検索に失敗した場合はStateを初期化して返す
-    // (ex: セレクトボックスを'選択してください'に戻したときなど)
-    if (!choosedCharacter) {
-      setMyCharacter([]);
-      return;
-    }
-
-    setMyCharacter(choosedCharacter);
   };
 
   // 成功判定値を設定
@@ -400,22 +365,8 @@ const RealTimeDice: React.FC = () => {
     dispatch(toggleLog());
   };
 
-  const handleChooseAddList = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { value } = e.target;
-    const target = characters.find(
-      (character: any) => value === character.name
-    );
-    setChoosedViewCharacter(target);
-  };
-
-  const handleAddList = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const currentViewCharacters = viewCharacters;
-    currentViewCharacters.push(choosedViewCharacter);
-    setViewCharacters(currentViewCharacters);
-  };
-
   useEffect(() => {
+    const currentLog: any[] = [];
     // Firestoreの変更を検知し、DOMの状態を変更 (リアルタイムダイス)
     const resultQueryCollection = firestore
       .collection('result')
@@ -426,7 +377,6 @@ const RealTimeDice: React.FC = () => {
         // Firestoreにデータが追加されたとき (※アプリ起動時にも発火する)
         if (change.type === 'added') {
           const rawData: firebase.firestore.DocumentData = change.doc.data();
-          const currentLog = resultLog;
 
           // ダイス演出を行う
           if (rawData.dice.type === '何か') {
@@ -439,32 +389,10 @@ const RealTimeDice: React.FC = () => {
           setCurrentResult(rawData);
           // ログに最新の結果をunshiftしてstateを更新
           currentLog.unshift(rawData);
-          setResultLog(currentLog);
         }
       });
+      setResultLog(currentLog);
     });
-
-    // Firestoreの変更を検知し、DOMの状態を変更 (キャラクタープレビュー)
-    // TODO: コンポーネント切り分けろ
-    const characterQueryCollection = firestore
-      .collection('character')
-      .orderBy('name', 'asc');
-
-    characterQueryCollection.onSnapshot((querySnapshot) => {
-      querySnapshot.docChanges().forEach((change) => {
-        // Firestoreにデータが追加されたとき (※アプリ起動時にも発火する)
-        if (change.type === 'added') {
-          const rawData: firebase.firestore.DocumentData = change.doc.data();
-          const currentCharacters = characters;
-
-          // currentCharactersに最新の結果をpushしてstateを更新
-          currentCharacters.push(rawData);
-          setCharacters(currentCharacters);
-        }
-      });
-    });
-    // TODO: useEffectは一回発火すれば十分なので今の所こう書いてる
-    // eslint-disable-next-line
   }, []);
 
   return (
@@ -495,19 +423,6 @@ const RealTimeDice: React.FC = () => {
             <option value="2">2</option>
           </Select>
         </DiceSetting>
-        <InputArea>
-          <label htmlFor="myName">
-            あなたは:
-            <select id="myName" onChange={(e) => handleChoosedMyCharacter(e)}>
-              <option value="">選択してください</option>
-              {characters.map((character: any) => (
-                <option key={`myName-${character.name}`} value={character.name}>
-                  {character.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        </InputArea>
         <InputArea>
           <label htmlFor="js-successNum">
             成功判定値(1 〜 99):
@@ -620,38 +535,6 @@ const RealTimeDice: React.FC = () => {
           </LogInner>
         </LogWrapper>
       </DiceWrapper>
-      <StatusWrapper>
-        <p>ステータス一覧</p>
-        {myCharacter && (
-          <>
-            <StatusCard>
-              <p>自分のキャラクター</p>
-              <p>{myCharacter.name}</p>
-              <p>{myCharacter.status}</p>
-            </StatusCard>
-            {viewCharacters.map((viewCharacter) => (
-              <StatusCard key={viewCharacter.name}>
-                <p>{viewCharacter.name}</p>
-                <p>{viewCharacter.status}</p>
-              </StatusCard>
-            ))}
-            <form onSubmit={(e) => handleAddList(e)}>
-              <select id="viewChara" onChange={(e) => handleChooseAddList(e)}>
-                <option value="">選択してください</option>
-                {characters.map((character: any) => (
-                  <option
-                    key={`viewChara-${character.name}`}
-                    value={character.name}
-                  >
-                    {character.name}
-                  </option>
-                ))}
-              </select>
-              <input type="submit" value="リストに追加" />
-            </form>
-          </>
-        )}
-      </StatusWrapper>
     </Wrapper>
   );
 };

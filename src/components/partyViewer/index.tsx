@@ -1,6 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { firestore } from '../../services/firebase';
+import {
+  getCharacters,
+  setMyCharacter,
+  selectPartyCharacter,
+  setPartyCharacters,
+} from '../../modules/partyViewer/actions';
+import { State } from '../../modules/index';
 
 const Wrapper = styled.section`
   width: calc(100vw - 320px);
@@ -8,8 +16,10 @@ const Wrapper = styled.section`
 `;
 
 const StatusCard = styled.div`
+  padding: 16px;
   margin-top: 16px;
   background: aliceblue;
+  border-radius: 4px;
 
   p {
     font-size: 1.6rem;
@@ -17,102 +27,136 @@ const StatusCard = styled.div`
 `;
 
 const PartyViewer: React.FC = () => {
-  // TODO: 以下はCharacterPreview関連のStateです 切り分けろ
-  const [myCharacter, setMyCharacter] = useState<any>({});
-  const [characters, setCharacters] = useState<firebase.firestore.DocumentData>(
-    []
+  const dispatch = useDispatch();
+  const characters = useSelector(
+    (state: State) => state.partyViewer.characters
   );
-  const [choosedViewCharacter, setChoosedViewCharacter] = useState<string>('');
-  const [viewCharacters, setViewCharacters] = useState<any[]>([]);
-
-  // 選択したキャラクターを使うよう設定
-  const handleChoosedMyCharacter = (e: any) => {
+  const myCharacter = useSelector(
+    (state: State) => state.partyViewer.myCharacter
+  );
+  const selectedCharacter = useSelector(
+    (state: State) => state.partyViewer.selectedCharacter
+  );
+  const partyCharacters = useSelector(
+    (state: State) => state.partyViewer.partyCharacters
+  );
+  // 選択したキャラクターをマイキャラクターとして設定
+  const handleChoosedMyCharacter = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     const choosedCharacterName = e.target.value;
     const choosedCharacter = characters.find(
-      (character: any) => character.name === choosedCharacterName
+      (character) => character.name === choosedCharacterName
     );
 
     // 検索に失敗した場合はStateを初期化して返す
     // (ex: セレクトボックスを'選択してください'に戻したときなど)
     if (!choosedCharacter) {
-      setMyCharacter([]);
+      dispatch(
+        setMyCharacter({
+          name: '',
+          str: 3,
+          con: 3,
+          pow: 3,
+          dex: 3,
+          app: 3,
+          siz: 8,
+          int: 8,
+          edu: 6,
+          status: '',
+        })
+      );
       return;
     }
 
-    setMyCharacter(choosedCharacter);
+    dispatch(setMyCharacter(choosedCharacter));
   };
 
-  const handleChooseAddList = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { value } = e.target;
+  // 選択したキャラクターをパーティ追加対象として設定
+  const handleSelectPartyCharacter = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const selectedCharacterName = e.target.value;
+
+    dispatch(selectPartyCharacter(selectedCharacterName));
+  };
+
+  // selectされているキャラクターをパーティに追加
+  const handleAddPartyCharacters = (e: React.FormEvent<HTMLFormElement>) => {
     const target = characters.find(
-      (character: any) => value === character.name
+      (character) => selectedCharacter === character.name
     );
-    setChoosedViewCharacter(target);
-  };
 
-  const handleAddList = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const currentViewCharacters = viewCharacters;
-    currentViewCharacters.push(choosedViewCharacter);
-    setViewCharacters(currentViewCharacters);
+    if (!target) return;
+
+    // 現在のパーティに対象キャラクターを追加し、Storeを更新
+    // MEMO: 配列stateの操作にpushのような破壊的メソッドは使わないほうがいい
+    const latestParty = [...partyCharacters, target];
+    dispatch(setPartyCharacters(latestParty));
   };
 
   useEffect(() => {
-    // Firestoreの変更を検知し、DOMの状態を変更 (キャラクタープレビュー)
-    // TODO: コンポーネント切り分けろ
+    // TODO: DocumentData型とCharacter型を共用する方法がわからない
+    const addedCharacters: any = [];
     const characterQueryCollection = firestore
       .collection('character')
       .orderBy('name', 'asc');
 
+    // Firestoreの変更を検知し, キャラクターリストを更新する
     characterQueryCollection.onSnapshot((querySnapshot) => {
       querySnapshot.docChanges().forEach((change) => {
         // Firestoreにデータが追加されたとき (※アプリ起動時にも発火する)
         if (change.type === 'added') {
           const rawData: firebase.firestore.DocumentData = change.doc.data();
-          const currentCharacters = characters;
-
-          // currentCharactersに最新の結果をpushしてstateを更新
-          currentCharacters.push(rawData);
-          setCharacters(currentCharacters);
+          addedCharacters.push(rawData);
         }
       });
+
+      const latestCharacters = [...characters, ...addedCharacters];
+      dispatch(getCharacters(latestCharacters));
     });
-    // TODO: useEffectは一回発火すれば十分なので今の所こう書いてる
-    // eslint-disable-next-line
   }, []);
 
   return (
     <Wrapper>
-      <p>ステータス一覧</p>
-      {myCharacter && (
-        <>
-          <StatusCard>
-            <p>自分のキャラクター</p>
-            <p>{myCharacter.name}</p>
-            <p>{myCharacter.status}</p>
-          </StatusCard>
-          {viewCharacters.map((viewCharacter) => (
-            <StatusCard key={viewCharacter.name}>
-              <p>{viewCharacter.name}</p>
-              <p>{viewCharacter.status}</p>
-            </StatusCard>
+      <p>あなたの名前は:</p>
+      <select onChange={(e) => handleChoosedMyCharacter(e)}>
+        <option value="">選択してください</option>
+        {characters.map((character) => (
+          <option key={`$myCharacter-${character.name}`} value={character.name}>
+            {character.name}
+          </option>
+        ))}
+      </select>
+      <form onSubmit={(e) => handleAddPartyCharacters(e)}>
+        <p>パーティに追加:</p>
+        <select onChange={(e) => handleSelectPartyCharacter(e)}>
+          <option value="">選択してください</option>
+          {characters.map((character) => (
+            <option
+              key={`$partyCharacter-${character.name}`}
+              value={character.name}
+            >
+              {character.name}
+            </option>
           ))}
-          <form onSubmit={(e) => handleAddList(e)}>
-            <select id="viewChara" onChange={(e) => handleChooseAddList(e)}>
-              <option value="">選択してください</option>
-              {characters.map((character: any) => (
-                <option
-                  key={`viewChara-${character.name}`}
-                  value={character.name}
-                >
-                  {character.name}
-                </option>
-              ))}
-            </select>
-            <input type="submit" value="リストに追加" />
-          </form>
-        </>
+        </select>
+        <button type="submit">追加</button>
+      </form>
+      {myCharacter && (
+        <StatusCard>
+          <p>自分のキャラクター</p>
+          <p>{myCharacter.name}</p>
+          <p>{myCharacter.status}</p>
+        </StatusCard>
       )}
+      {partyCharacters.map((partyCharacter) => (
+        <StatusCard key={partyCharacter.name}>
+          <p>{partyCharacter.name}</p>
+          <p>{partyCharacter.status}</p>
+        </StatusCard>
+      ))}
     </Wrapper>
   );
 };

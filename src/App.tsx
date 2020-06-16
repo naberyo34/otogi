@@ -5,13 +5,13 @@ import CharacterMaker from './pages/CharacterMaker';
 
 const App: React.FC = () => (
   <BrowserRouter>
-    <p>otogi v0.35</p>
+    <p>otogi v0.4</p>
     <ul>
       <li>
         <Link to="/session-room">セッションルーム</Link>
       </li>
       <li>
-        <Link to="/character-maker">キャラクターメーカー(alpha)</Link>
+        <Link to="/character-maker">キャラクターメーカー (beta)</Link>
       </li>
     </ul>
     <Route path="/session-room" component={SessionRoom} />

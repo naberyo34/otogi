@@ -41,7 +41,7 @@ const characterMaker = (
 ): CharacterMakerState => {
   switch (action.type) {
     // STRなどの値を変更したとき
-    case types.EDIT_CHARACTER_PARAMS: {
+    case types.SET_CHARACTER_PARAMS: {
       return {
         // character以外のstateは変更しない
         ...state,
@@ -53,7 +53,7 @@ const characterMaker = (
       };
     }
     // テキストエリアに入力したとき
-    case types.EDIT_CHARACTER_TEXT: {
+    case types.SET_CHARACTER_TEXT: {
       return {
         ...state,
         character: {

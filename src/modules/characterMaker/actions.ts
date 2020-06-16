@@ -8,12 +8,12 @@ export interface Action {
 }
 
 // ここで渡すpayloadは {str: 18} みたいな形
-export const editCharacterParams = (payload: any): Action => ({
-  type: types.EDIT_CHARACTER_PARAMS,
+export const setCharacterParams = (payload: any): Action => ({
+  type: types.SET_CHARACTER_PARAMS,
   payload,
 });
 
-export const editCharacterText = (payload: any): Action => ({
-  type: types.EDIT_CHARACTER_TEXT,
+export const setCharacterText = (payload: any): Action => ({
+  type: types.SET_CHARACTER_TEXT,
   payload,
 });
