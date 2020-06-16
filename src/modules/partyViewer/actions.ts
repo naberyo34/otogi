@@ -27,3 +27,8 @@ export const setPartyCharacters = (payload: Character[]): Action => ({
   type: types.SET_PARTY_CHARACTERS,
   payload,
 });
+
+export const selectSkillTab = (payload: string): Action => ({
+  type: types.SELECT_SKILL_TAB,
+  payload,
+});

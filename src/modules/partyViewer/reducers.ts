@@ -7,6 +7,7 @@ export interface PartyViewerState {
   myCharacter: Character;
   selectedCharacter: string;
   partyCharacters: Character[];
+  skillTab: string;
 }
 
 // stateの初期化
@@ -15,6 +16,7 @@ const initialState: PartyViewerState = {
   myCharacter: initialCharacter,
   selectedCharacter: '',
   partyCharacters: [],
+  skillTab: 'combat',
 };
 
 // Reducerの定義
@@ -46,6 +48,12 @@ const partyViewer = (
       return {
         ...state,
         partyCharacters: action.payload,
+      };
+    }
+    case types.SELECT_SKILL_TAB: {
+      return {
+        ...state,
+        skillTab: action.payload,
       };
     }
     default:

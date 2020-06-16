@@ -28,6 +28,8 @@ interface StyledProps {
 
 const Wrapper = styled.section`
   display: flex;
+  height: 90vh;
+  overflow-y: scroll;
 `;
 
 const DiceWrapper = styled.section`

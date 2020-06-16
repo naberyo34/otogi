@@ -27,7 +27,13 @@ export interface Character {
     current: number;
     madness: number;
   };
-  status: string;
+  skill: {
+    combat: string;
+    explore: string;
+    behavior: string;
+    negotiation: string;
+    knowledge: string;
+  };
 }
 
 // export interface Status {
@@ -69,7 +75,13 @@ export const initialCharacter: Character = {
     // max - (max / 5)
     madness: 12,
   },
-  status: '',
+  skill: {
+    combat: '',
+    explore: '',
+    behavior: '',
+    negotiation: '',
+    knowledge: '',
+  },
 };
 
 export interface CharacterMakerState {
@@ -87,25 +99,38 @@ const characterMaker = (
   action: Action
 ): CharacterMakerState => {
   switch (action.type) {
-    // STRなどの値を変更したとき
-    case types.SET_CHARACTER_PARAMS: {
+    // 名前を入力したとき
+    case types.SET_CHARACTER_NAME: {
       return {
         // character以外のstateは変更しない
         ...state,
         character: {
-          // ここで一度元々のcharacterの値を展開し、そこにpayloadの内容を上書きする
+          // characterも指定要素以外は変更しない
+          ...state.character,
+          name: action.payload,
+        },
+      };
+    }
+    // STRなどの値を変更したとき
+    case types.SET_CHARACTER_PARAMS: {
+      return {
+        ...state,
+        character: {
           ...state.character,
           ...action.payload,
         },
       };
     }
-    // テキストエリアに入力したとき
-    case types.SET_CHARACTER_TEXT: {
+    // 技能欄に入力したとき
+    case types.SET_CHARACTER_SKILL: {
       return {
         ...state,
         character: {
           ...state.character,
-          ...action.payload,
+          skill: {
+            ...state.character.skill,
+            ...action.payload,
+          },
         },
       };
     }
