@@ -11,11 +11,11 @@ const Wrapper = styled.section`
   font-size: 1.6rem;
 `;
 
-const StatusArea = styled.textarea``;
-
 const CharacterMaker: React.FC = () => {
   const dispatch = useDispatch();
-  const newCharacter = useSelector((state: State) => state.characterMaker);
+  const newCharacter = useSelector(
+    (state: State) => state.characterMaker.character
+  );
   // テキストエリアに入力した内容をStoreにも反映
   const handleEditText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const targetText = e.target.value;
@@ -28,13 +28,39 @@ const CharacterMaker: React.FC = () => {
 
     dispatch(setCharacterText(changeText));
   };
-  // Storeの情報をFirestoreに送信する
+  // 計算が必要な能力値をすべて算出し, Firestoreに格納
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const luck = newCharacter.pow * 5;
+    const idea = newCharacter.int * 5;
+    const know = newCharacter.edu * 5;
+    const hp = {
+      max: Math.floor((newCharacter.con + newCharacter.siz) / 2),
+      current: Math.floor((newCharacter.con + newCharacter.siz) / 2),
+    };
+    const mp = newCharacter.pow;
+    const san = {
+      max: newCharacter.pow * 5,
+      current: newCharacter.pow * 5,
+      madness: newCharacter.pow * 4,
+    };
+    // TODO: 何もluckとかまでStoreに入れ直す必要がないことに気づいた
+    // Characterインターフェースとは別にStore用のインターフェースを用意したほうがよさそう
+    const submitCharacter = {
+      ...newCharacter,
+      luck,
+      idea,
+      know,
+      hp,
+      mp,
+      san,
+    };
+
     // キャラクターをfirestoreに追加
     firestore
       .collection('character')
-      .add(newCharacter)
+      .add(submitCharacter)
       .then(() => {
         alert('送信に成功しました');
       });
@@ -42,29 +68,22 @@ const CharacterMaker: React.FC = () => {
 
   return (
     <Wrapper>
-      <h2>キャラクターメーカー (alpha ver.)</h2>
+      <h2>キャラクターメーカー (beta ver.)</h2>
+      <p>※いまのところクトゥルフ神話TRPG 旧ルールフォーマットのみ対応</p>
       <p>
-        RTDのキャラクター表示機能テスト用のため、現状実用性はありません。
-        <br />
-        ※ここで入力するのは『初期能力値』です。増減等は別に編集機能を設ける予定。
+        実装に時間食いそうなので、一旦よそで作ってパラメータブチ込む形とさせてくれ
       </p>
-      <p>現状旧ルール仕様のみ対応</p>
       <form onSubmit={(e) => handleSubmit(e)}>
-        <label htmlFor="characterName">
-          プレイヤー名:
-          <textarea
-            data-js-label="name"
-            id="characterName"
-            placeholder="五味 葛男"
-            onChange={(e) => handleEditText(e)}
-          />
-        </label>
+        <span>プレイヤー名:</span>
+        <textarea
+          data-js-label="name"
+          placeholder="五味 葛男"
+          onChange={(e) => handleEditText(e)}
+        />
         <InputCharacterParams />
         <span>ステータス:</span>
-        <StatusArea
+        <textarea
           data-js-label="status"
-          cols={100}
-          rows={4}
           placeholder="自由記述"
           onChange={(e) => handleEditText(e)}
         />

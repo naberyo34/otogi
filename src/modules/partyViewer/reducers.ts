@@ -1,6 +1,6 @@
 import { Action } from './actions';
 import types from './actionTypes';
-import { Character } from '../characterMaker/reducers';
+import { Character, initialCharacter } from '../characterMaker/reducers';
 
 export interface PartyViewerState {
   characters: Character[];
@@ -12,18 +12,7 @@ export interface PartyViewerState {
 // stateの初期化
 const initialState: PartyViewerState = {
   characters: [],
-  myCharacter: {
-    name: '',
-    str: 3,
-    con: 3,
-    pow: 3,
-    dex: 3,
-    app: 3,
-    siz: 8,
-    int: 8,
-    edu: 6,
-    status: '',
-  },
+  myCharacter: initialCharacter,
   selectedCharacter: '',
   partyCharacters: [],
 };

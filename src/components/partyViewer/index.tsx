@@ -9,6 +9,7 @@ import {
   setPartyCharacters,
 } from '../../modules/partyViewer/actions';
 import { State } from '../../modules/index';
+import { initialCharacter } from '../../modules/characterMaker/reducers';
 
 const Wrapper = styled.section`
   width: calc(100vw - 320px);
@@ -52,20 +53,7 @@ const PartyViewer: React.FC = () => {
     // 検索に失敗した場合はStateを初期化して返す
     // (ex: セレクトボックスを'選択してください'に戻したときなど)
     if (!choosedCharacter) {
-      dispatch(
-        setMyCharacter({
-          name: '',
-          str: 3,
-          con: 3,
-          pow: 3,
-          dex: 3,
-          app: 3,
-          siz: 8,
-          int: 8,
-          edu: 6,
-          status: '',
-        })
-      );
+      dispatch(setMyCharacter(initialCharacter));
       return;
     }
 
@@ -83,11 +71,11 @@ const PartyViewer: React.FC = () => {
 
   // selectされているキャラクターをパーティに追加
   const handleAddPartyCharacters = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     const target = characters.find(
       (character) => selectedCharacter === character.name
     );
 
-    e.preventDefault();
     if (!target) return;
 
     // 現在のパーティに対象キャラクターを追加し、Storeを更新
