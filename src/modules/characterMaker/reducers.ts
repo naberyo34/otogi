@@ -1,8 +1,7 @@
 import { Action } from './actions';
 import types from './actionTypes';
 
-// stateの型定義
-export interface CharacterMakerState {
+export interface Character {
   name: string;
   str: number;
   con: number;
@@ -15,18 +14,24 @@ export interface CharacterMakerState {
   status: string;
 }
 
+export interface CharacterMakerState {
+  character: Character;
+}
+
 // stateの初期化
 const initialState: CharacterMakerState = {
-  name: '',
-  str: 3,
-  con: 3,
-  pow: 3,
-  dex: 3,
-  app: 3,
-  siz: 8,
-  int: 8,
-  edu: 6,
-  status: '',
+  character: {
+    name: '',
+    str: 3,
+    con: 3,
+    pow: 3,
+    dex: 3,
+    app: 3,
+    siz: 8,
+    int: 8,
+    edu: 6,
+    status: '',
+  },
 };
 
 // Reducerの定義
@@ -38,15 +43,23 @@ const characterMaker = (
     // STRなどの値を変更したとき
     case types.EDIT_CHARACTER_PARAMS: {
       return {
+        // character以外のstateは変更しない
         ...state,
-        ...action.payload,
+        character: {
+          // ここで一度元々のcharacterの値を展開し、そこにpayloadの内容を上書きする
+          ...state.character,
+          ...action.payload,
+        },
       };
     }
     // テキストエリアに入力したとき
     case types.EDIT_CHARACTER_TEXT: {
       return {
         ...state,
-        ...action.payload,
+        character: {
+          ...state.character,
+          ...action.payload,
+        },
       };
     }
     default:

@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { firestore } from '../services/firebase';
-import Sound from '../components/realTimeDice/Sound';
-import diceRoll, { DiceResult, HiddenDiceResult } from '../services/diceRoll';
-import formatDate from '../services/formatDate';
-import generateRandomId from '../services/generateRandomId';
-import { State } from '../modules/index';
-import toggleLog from '../modules/realTimeDice/actions';
+import { firestore } from '../../services/firebase';
+import Sound from './Sound';
+import diceRoll, {
+  DiceResult,
+  HiddenDiceResult,
+} from '../../services/diceRoll';
+import formatDate from '../../services/formatDate';
+import generateRandomId from '../../services/generateRandomId';
+import { State } from '../../modules/index';
+import toggleLog from '../../modules/realTimeDice/actions';
 
 interface Result {
   id?: string;
@@ -397,7 +400,7 @@ const RealTimeDice: React.FC = () => {
     dispatch(toggleLog());
   };
 
-  const handleChooseAddList = (e: any) => {
+  const handleChooseAddList = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
     const target = characters.find(
       (character: any) => value === character.name
@@ -405,7 +408,7 @@ const RealTimeDice: React.FC = () => {
     setChoosedViewCharacter(target);
   };
 
-  const handleAddList = (e: any) => {
+  const handleAddList = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const currentViewCharacters = viewCharacters;
     currentViewCharacters.push(choosedViewCharacter);
