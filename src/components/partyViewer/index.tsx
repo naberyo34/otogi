@@ -10,7 +10,10 @@ import {
   selectSkillTab,
 } from '../../modules/partyViewer/actions';
 import { State } from '../../modules/index';
-import { initialCharacter } from '../../modules/characterMaker/reducers';
+import {
+  Character,
+  initialCharacter,
+} from '../../modules/characterMaker/reducers';
 
 const Wrapper = styled.section`
   width: calc(100vw - 320px);
@@ -52,14 +55,13 @@ const PartyViewer: React.FC = () => {
   const characters = useSelector(
     (state: State) => state.partyViewer.characters
   );
-  // MEMO: anyにしないとタブが効かなくなる……
-  const myCharacter: any = useSelector(
+  const myCharacter: Character = useSelector(
     (state: State) => state.partyViewer.myCharacter
   );
   const selectedCharacter = useSelector(
     (state: State) => state.partyViewer.selectedCharacter
   );
-  const partyCharacters: any = useSelector(
+  const partyCharacters: Character[] = useSelector(
     (state: State) => state.partyViewer.partyCharacters
   );
   const skillTab = useSelector((state: State) => state.partyViewer.skillTab);
@@ -106,30 +108,57 @@ const PartyViewer: React.FC = () => {
     dispatch(setPartyCharacters(latestParty));
   };
 
+  // 技能表示のタブ切り替え
   const handleChangeSkillTab = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     dispatch(selectSkillTab(value));
   };
 
+  /**
+   * 可変パラメータの値変更をFirestoreに反映する
+   * @param e イベント
+   * @param paramType 対象のパラメータ(ex: 'hp' とか)
+   */
+  const handleChangeCurrentParam = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    paramType: 'hp' | 'mp' | 'san'
+  ) => {
+    const { value } = e.target;
+    // バリデーション
+    if (value === '') {
+      alert('無効な値です。数値だけが入力できます');
+      return;
+    }
+    const valueNum = parseInt(e.target.value, 10);
+    const updateParam = {
+      [paramType]: {
+        ...myCharacter[paramType],
+        current: valueNum,
+      },
+    };
+
+    // Firestoreを更新
+    firestore.collection('character').doc(myCharacter.name).update(updateParam);
+  };
+
   useEffect(() => {
-    // TODO: DocumentData型とCharacter型を共用する方法がわからない
-    const addedCharacters: any = [];
     const characterQueryCollection = firestore
       .collection('character')
       .orderBy('name', 'asc');
 
     // Firestoreの変更を検知し, キャラクターリストを更新する
     characterQueryCollection.onSnapshot((querySnapshot) => {
+      const addedCharacters: Character[] = [];
       querySnapshot.docChanges().forEach((change) => {
-        // Firestoreにデータが追加されたとき (※アプリ起動時にも発火する)
+        // キャラクターデータが追加されたとき (※アプリ起動時にも発火する)
         if (change.type === 'added') {
-          const rawData: firebase.firestore.DocumentData = change.doc.data();
+          // ここでFirestoreから受け取る値はCharacter型のはずなので、キャストしている
+          const rawData = change.doc.data() as Character;
           addedCharacters.push(rawData);
         }
       });
-
-      const latestCharacters = [...characters, ...addedCharacters];
-      dispatch(getCharacters(latestCharacters));
+      const savedCharacters = [...addedCharacters];
+      dispatch(getCharacters(savedCharacters));
     });
   }, []);
 
@@ -160,7 +189,7 @@ const PartyViewer: React.FC = () => {
         <button type="submit">追加</button>
       </form>
       {/* TODO: 省略して書け */}
-      <p>技能</p>
+      <p>技能表示</p>
       <input
         type="radio"
         name="skill"
@@ -227,13 +256,34 @@ const PartyViewer: React.FC = () => {
             <tbody>
               <tr>
                 <td>
-                  {myCharacter.hp.current} / {myCharacter.hp.max}
+                  <input
+                    type="number"
+                    min="0"
+                    max={myCharacter.hp.max}
+                    value={myCharacter.hp.current}
+                    onChange={(e) => handleChangeCurrentParam(e, 'hp')}
+                  />{' '}
+                  / {myCharacter.hp.max}
                 </td>
                 <td>
-                  {myCharacter.mp.current} / {myCharacter.mp.max}
+                  <input
+                    type="number"
+                    min="0"
+                    max={myCharacter.mp.max}
+                    value={myCharacter.mp.current}
+                    onChange={(e) => handleChangeCurrentParam(e, 'mp')}
+                  />{' '}
+                  / {myCharacter.mp.max}
                 </td>
                 <td>
-                  {myCharacter.san.current} / {myCharacter.san.max}
+                  <input
+                    type="number"
+                    min="0"
+                    max={myCharacter.san.max}
+                    value={myCharacter.san.current}
+                    onChange={(e) => handleChangeCurrentParam(e, 'san')}
+                  />{' '}
+                  / {myCharacter.san.max}
                   <br />
                   不定の狂気: {myCharacter.san.madness}
                 </td>
@@ -253,7 +303,7 @@ const PartyViewer: React.FC = () => {
           <SkillText>{myCharacter.skill[skillTab]}</SkillText>
         </StatusCard>
       )}
-      {partyCharacters.map((partyCharacter: any) => (
+      {partyCharacters.map((partyCharacter) => (
         <StatusCard key={`partyCharacter-${partyCharacter.name}`}>
           <p>{partyCharacter.name}</p>
           <ParamsTable>

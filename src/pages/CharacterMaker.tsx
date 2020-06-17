@@ -73,7 +73,8 @@ const CharacterMaker: React.FC = () => {
     // キャラクターをfirestoreに追加
     firestore
       .collection('character')
-      .add(submitCharacter)
+      .doc(submitCharacter.name)
+      .set(submitCharacter)
       .then(() => {
         alert('送信に成功しました');
       });

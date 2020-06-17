@@ -1,6 +1,25 @@
 import { Action } from './actions';
 import types from './actionTypes';
 
+interface VariableParams {
+  max: number;
+  current: number;
+}
+
+interface San extends VariableParams {
+  madness: number;
+}
+
+interface Skill {
+  combat: string;
+  explore: string;
+  behavior: string;
+  negotiation: string;
+  knowledge: string;
+  // 何を指定しようがstringが返ってくる
+  [key: string]: string;
+}
+
 export interface Character {
   name: string;
   str: number;
@@ -14,26 +33,12 @@ export interface Character {
   luck: number;
   idea: number;
   know: number;
-  hp: {
-    max: number;
-    current: number;
-  };
-  mp: {
-    max: number;
-    current: number;
-  };
-  san: {
-    max: number;
-    current: number;
-    madness: number;
-  };
-  skill: {
-    combat: string;
-    explore: string;
-    behavior: string;
-    negotiation: string;
-    knowledge: string;
-  };
+  hp: VariableParams;
+  mp: VariableParams;
+  san: San;
+  skill: Skill;
+  // 変数でキーを参照したときに怒られないよう、全パターンを列挙
+  [key: string]: string | number | VariableParams | San | Skill;
 }
 
 // export interface Status {
