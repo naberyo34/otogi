@@ -229,7 +229,7 @@ const RealTimeDice: React.FC = () => {
     }
 
     // 成功判定値が設定されている場合、判定を入れて結果を返す
-    let success = dice.last < successNum ? '成功' : '失敗';
+    let success = dice.last <= successNum ? '成功' : '失敗';
 
     // もしクリティカルかファンブルが出ているなら、その結果を返す
     if (dice.type === '1D100' && dice.last <= 5) success = 'クリティカル';
