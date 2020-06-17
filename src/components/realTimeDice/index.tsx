@@ -220,7 +220,7 @@ const RealTimeDice: React.FC = () => {
     // 成功判定値が0 (未定義) の場合、判定は入れずに結果を返す
     if (successNum === 0) {
       const newResult: Result = {
-        playerName: myCharacter.name,
+        playerName: myCharacter,
         dice,
         timestamp: currentDate,
       };
@@ -236,7 +236,7 @@ const RealTimeDice: React.FC = () => {
     if (dice.type === '1D100' && dice.last >= 96) success = 'ファンブル';
 
     const newResult: Result = {
-      playerName: myCharacter.name,
+      playerName: myCharacter,
       dice,
       success,
       timestamp: currentDate,
@@ -314,7 +314,7 @@ const RealTimeDice: React.FC = () => {
    * @param rollType ダイスロールのタイプ(グローバル、出目伏せ、ローカル)
    */
   const handleDiceRoll = (rollType: 'global' | 'hiding' | 'local') => {
-    if (!myCharacter.name) {
+    if (!myCharacter) {
       alert('先にキャラクターを選択してください');
       return;
     }

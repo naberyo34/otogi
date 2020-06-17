@@ -10,10 +10,7 @@ import {
   selectSkillTab,
 } from '../../modules/partyViewer/actions';
 import { State } from '../../modules/index';
-import {
-  Character,
-  initialCharacter,
-} from '../../modules/characterMaker/reducers';
+import { Character } from '../../modules/characterMaker/reducers';
 
 const Wrapper = styled.section`
   width: calc(100vw - 320px);
@@ -55,65 +52,62 @@ const PartyViewer: React.FC = () => {
   const characters = useSelector(
     (state: State) => state.partyViewer.characters
   );
-  const myCharacter: Character = useSelector(
+  const myCharacter = useSelector(
     (state: State) => state.partyViewer.myCharacter
   );
   const selectedCharacter = useSelector(
     (state: State) => state.partyViewer.selectedCharacter
   );
-  const partyCharacters: Character[] = useSelector(
+  const partyCharacters = useSelector(
     (state: State) => state.partyViewer.partyCharacters
   );
   const skillTab = useSelector((state: State) => state.partyViewer.skillTab);
-  // 選択したキャラクターをマイキャラクターとして設定
-  const handleChoosedMyCharacter = (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const choosedCharacterName = e.target.value;
-    const choosedCharacter = characters.find(
-      (character) => character.name === choosedCharacterName
-    );
+  /**
+   * partyCharacters(String[])から実データ(Character[])を生成
+   * @returns パーティメンバーの情報が格納された配列
+   */
+  const findPartyCharactersData = () => {
+    const dataArray: Character[] = [];
 
-    // 検索に失敗した場合はStateを初期化して返す
-    // (ex: セレクトボックスを'選択してください'に戻したときなど)
-    if (!choosedCharacter) {
-      dispatch(setMyCharacter(initialCharacter));
-      return;
-    }
+    partyCharacters.forEach((partyCharacter) => {
+      const data = characters.find(
+        (character) => character.name === partyCharacter
+      );
 
-    dispatch(setMyCharacter(choosedCharacter));
+      if (data) dataArray.push(data);
+    });
+
+    return dataArray;
   };
 
-  // 選択したキャラクターをパーティ追加対象として設定
+  // stateから検索したキャラクターの実データ これをレンダリングに使う
+  const myCharacterData = characters.find(
+    (character) => character.name === myCharacter
+  );
+  const partyCharactersData = findPartyCharactersData();
+  // 選択したキャラクターをマイキャラクターとして設定
+  const handleSelectMyCharacter = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = e.target;
+    dispatch(setMyCharacter(value));
+  };
+  // パーティ追加対象のキャラクターを選択
   const handleSelectPartyCharacter = (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    const selectedCharacterName = e.target.value;
-
-    dispatch(selectPartyCharacter(selectedCharacterName));
+    const { value } = e.target;
+    dispatch(selectPartyCharacter(value));
   };
-
-  // selectされているキャラクターをパーティに追加
+  // 選択したキャラクターをパーティに追加
   const handleAddPartyCharacters = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const target = characters.find(
-      (character) => selectedCharacter === character.name
-    );
-
-    if (!target) return;
-
-    // 現在のパーティに対象キャラクターを追加し、Storeを更新
-    // MEMO: 配列stateの操作にpushのような破壊的メソッドは使わないほうがいい
-    const latestParty = [...partyCharacters, target];
-    dispatch(setPartyCharacters(latestParty));
+    const addedParty = [...partyCharacters, selectedCharacter];
+    dispatch(setPartyCharacters(addedParty));
   };
-
   // 技能表示のタブ切り替え
   const handleChangeSkillTab = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     dispatch(selectSkillTab(value));
   };
-
   /**
    * 可変パラメータの値変更をFirestoreに反映する
    * @param e イベント
@@ -125,20 +119,27 @@ const PartyViewer: React.FC = () => {
   ) => {
     const { value } = e.target;
     // バリデーション
-    if (value === '') {
-      alert('無効な値です。数値だけが入力できます');
+    if (!value) {
+      alert('入力値が不正です。数値のみが入力できます');
       return;
     }
-    const valueNum = parseInt(e.target.value, 10);
+    if (!myCharacterData) {
+      alert(
+        'マイキャラクターが設定されていません。もしこのエラーが出たら開発チームまでご連絡ください'
+      );
+      return;
+    }
+
+    const valueInt = parseInt(value, 10);
     const updateParam = {
       [paramType]: {
-        ...myCharacter[paramType],
-        current: valueNum,
+        ...myCharacterData[paramType],
+        current: valueInt,
       },
     };
 
     // Firestoreを更新
-    firestore.collection('character').doc(myCharacter.name).update(updateParam);
+    firestore.collection('character').doc(myCharacter).update(updateParam);
   };
 
   useEffect(() => {
@@ -146,26 +147,47 @@ const PartyViewer: React.FC = () => {
       .collection('character')
       .orderBy('name', 'asc');
 
-    // Firestoreの変更を検知し, キャラクターリストを更新する
+    // Firestoreが変更を検知したときに発火し、以下の処理を行う
     characterQueryCollection.onSnapshot((querySnapshot) => {
-      const addedCharacters: Character[] = [];
+      const currentCharacters = characters;
+
       querySnapshot.docChanges().forEach((change) => {
-        // キャラクターデータが追加されたとき (※アプリ起動時にも発火する)
-        if (change.type === 'added') {
-          // ここでFirestoreから受け取る値はCharacter型のはずなので、キャストしている
-          const rawData = change.doc.data() as Character;
-          addedCharacters.push(rawData);
+        // ここでFirestoreから受け取る値はCharacter型のはずなので、キャストしている
+        const rawData = change.doc.data() as Character;
+        const targetIndex = currentCharacters.findIndex(
+          (character) => character.name === rawData.name
+        );
+        switch (change.type) {
+          // キャラクターデータが追加されたとき (※アプリ起動時にも発火する)
+          case 'added':
+            // すでに読み込みが完了している場合は無視する (画面遷移などでuseEffectが再度発火したとき用)
+            if (characters.some((character) => character.name === rawData.name))
+              return;
+
+            currentCharacters.push(rawData);
+            break;
+          // キャラクターデータが変更されたとき
+          case 'modified':
+            currentCharacters.splice(targetIndex, 1, rawData);
+            break;
+          default:
+            break;
         }
       });
-      const savedCharacters = [...addedCharacters];
-      dispatch(getCharacters(savedCharacters));
+
+      // 新しい配列を作成し、dispatchする
+      // MEMO: 配列は新たに作成しないとReactが変更として検知しないことがある
+      const returnCharacters = [...currentCharacters];
+      dispatch(getCharacters(returnCharacters));
     });
+    // MEMO: 初回にonSnapshotが読み込まれた時点であとはリッスンしてくれるので、useEffectは初回しか起動しない
+    // eslint-disable-next-line
   }, []);
 
   return (
     <Wrapper>
       <p>あなたの名前は:</p>
-      <select onChange={(e) => handleChoosedMyCharacter(e)}>
+      <select onChange={(e) => handleSelectMyCharacter(e)}>
         <option value="">選択してください</option>
         {characters.map((character) => (
           <option key={`$myCharacter-${character.name}`} value={character.name}>
@@ -230,10 +252,10 @@ const PartyViewer: React.FC = () => {
         onChange={(e) => handleChangeSkillTab(e)}
       />
       <span>知識系</span>
-      {myCharacter.name && (
+      {myCharacterData && (
         <StatusCard>
           <p>自分のキャラクター</p>
-          <p>{myCharacter.name}</p>
+          <p>{myCharacterData.name}</p>
           {/* TODO: もうちょっとどうにかしろ */}
           <ParamsTable>
             <thead>
@@ -259,51 +281,51 @@ const PartyViewer: React.FC = () => {
                   <input
                     type="number"
                     min="0"
-                    max={myCharacter.hp.max}
-                    value={myCharacter.hp.current}
+                    max={myCharacterData.hp.max}
+                    value={myCharacterData.hp.current}
                     onChange={(e) => handleChangeCurrentParam(e, 'hp')}
                   />{' '}
-                  / {myCharacter.hp.max}
+                  / {myCharacterData.hp.max}
                 </td>
                 <td>
                   <input
                     type="number"
                     min="0"
-                    max={myCharacter.mp.max}
-                    value={myCharacter.mp.current}
+                    max={myCharacterData.mp.max}
+                    value={myCharacterData.mp.current}
                     onChange={(e) => handleChangeCurrentParam(e, 'mp')}
                   />{' '}
-                  / {myCharacter.mp.max}
+                  / {myCharacterData.mp.max}
                 </td>
                 <td>
                   <input
                     type="number"
                     min="0"
-                    max={myCharacter.san.max}
-                    value={myCharacter.san.current}
+                    max={myCharacterData.san.max}
+                    value={myCharacterData.san.current}
                     onChange={(e) => handleChangeCurrentParam(e, 'san')}
                   />{' '}
-                  / {myCharacter.san.max}
+                  / {myCharacterData.san.max}
                   <br />
-                  不定の狂気: {myCharacter.san.madness}
+                  不定の狂気: {myCharacterData.san.madness}
                 </td>
-                <td>{myCharacter.str}</td>
-                <td>{myCharacter.con}</td>
-                <td>{myCharacter.pow}</td>
-                <td>{myCharacter.dex}</td>
-                <td>{myCharacter.app}</td>
-                <td>{myCharacter.siz}</td>
-                <td>{myCharacter.int}</td>
-                <td>{myCharacter.edu}</td>
-                <td>{myCharacter.luck}</td>
-                <td>{myCharacter.idea}</td>
+                <td>{myCharacterData.str}</td>
+                <td>{myCharacterData.con}</td>
+                <td>{myCharacterData.pow}</td>
+                <td>{myCharacterData.dex}</td>
+                <td>{myCharacterData.app}</td>
+                <td>{myCharacterData.siz}</td>
+                <td>{myCharacterData.int}</td>
+                <td>{myCharacterData.edu}</td>
+                <td>{myCharacterData.luck}</td>
+                <td>{myCharacterData.idea}</td>
               </tr>
             </tbody>
           </ParamsTable>
-          <SkillText>{myCharacter.skill[skillTab]}</SkillText>
+          <SkillText>{myCharacterData.skill[skillTab]}</SkillText>
         </StatusCard>
       )}
-      {partyCharacters.map((partyCharacter) => (
+      {partyCharactersData.map((partyCharacter) => (
         <StatusCard key={`partyCharacter-${partyCharacter.name}`}>
           <p>{partyCharacter.name}</p>
           <ParamsTable>

@@ -13,7 +13,7 @@ export const getCharacters = (payload: Character[]): Action => ({
   payload,
 });
 
-export const setMyCharacter = (payload: Character): Action => ({
+export const setMyCharacter = (payload: string): Action => ({
   type: types.SET_MY_CHARACTER,
   payload,
 });
@@ -23,7 +23,7 @@ export const selectPartyCharacter = (payload: string): Action => ({
   payload,
 });
 
-export const setPartyCharacters = (payload: Character[]): Action => ({
+export const setPartyCharacters = (payload: string[]): Action => ({
   type: types.SET_PARTY_CHARACTERS,
   payload,
 });

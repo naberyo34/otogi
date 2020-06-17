@@ -1,19 +1,19 @@
 import { Action } from './actions';
 import types from './actionTypes';
-import { Character, initialCharacter } from '../characterMaker/reducers';
+import { Character } from '../characterMaker/reducers';
 
 export interface PartyViewerState {
   characters: Character[];
-  myCharacter: Character;
+  myCharacter: string;
   selectedCharacter: string;
-  partyCharacters: Character[];
+  partyCharacters: string[];
   skillTab: string;
 }
 
 // stateの初期化
 const initialState: PartyViewerState = {
   characters: [],
-  myCharacter: initialCharacter,
+  myCharacter: '',
   selectedCharacter: '',
   partyCharacters: [],
   skillTab: 'combat',
