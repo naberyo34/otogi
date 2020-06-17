@@ -1,15 +1,23 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const Wrapper = styled.section`
+const Wrapper = styled.div`
   margin-top: 32px;
+`;
+
+const Description = styled.p`
+  text-align: center;
+`;
+
+const Audio = styled.audio`
+  width: 100%;
 `;
 
 const Sound: React.FC = () => (
   <Wrapper>
-    <p>ダイスの音量チェックはここからどうぞ</p>
+    <Description>DICE SOUND</Description>
     {/* eslint-disable-next-line */}
-    <audio src="./diceroll.wav" controls id="js-sound" />
+    <Audio src="./diceroll.wav" controls id="js-sound" />
   </Wrapper>
 );
 

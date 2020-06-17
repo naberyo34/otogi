@@ -4,9 +4,9 @@ import styled from 'styled-components';
 import { firestore } from '../../services/firebase';
 import {
   getCharacters,
-  setMyCharacter,
-  selectPartyCharacter,
-  setPartyCharacters,
+  setMyCharacterName,
+  selectPartyCharacterName,
+  setPartyCharacterNames,
   selectSkillTab,
 } from '../../modules/partyViewer/actions';
 import { State } from '../../modules/index';
@@ -17,6 +17,22 @@ const Wrapper = styled.section`
   height: 90vh;
   padding: 16px;
   overflow-y: scroll;
+`;
+
+const PartyForm = styled.form`
+  margin-top: 16px;
+
+  button {
+    margin-left: 8px;
+    color: white;
+    cursor: pointer;
+    background: black;
+    border-radius: 8px;
+  }
+`;
+
+const SkillTab = styled.div`
+  margin-top: 16px;
 `;
 
 const StatusCard = styled.div`
@@ -52,14 +68,14 @@ const PartyViewer: React.FC = () => {
   const characters = useSelector(
     (state: State) => state.partyViewer.characters
   );
-  const myCharacter = useSelector(
-    (state: State) => state.partyViewer.myCharacter
+  const myCharacterName = useSelector(
+    (state: State) => state.partyViewer.myCharacterName
   );
-  const selectedCharacter = useSelector(
-    (state: State) => state.partyViewer.selectedCharacter
+  const selectedCharacterName = useSelector(
+    (state: State) => state.partyViewer.selectedCharacterName
   );
-  const partyCharacters = useSelector(
-    (state: State) => state.partyViewer.partyCharacters
+  const partyCharacterNames = useSelector(
+    (state: State) => state.partyViewer.partyCharacterNames
   );
   const skillTab = useSelector((state: State) => state.partyViewer.skillTab);
   /**
@@ -69,9 +85,9 @@ const PartyViewer: React.FC = () => {
   const findPartyCharactersData = () => {
     const dataArray: Character[] = [];
 
-    partyCharacters.forEach((partyCharacter) => {
+    partyCharacterNames.forEach((partyCharacterName) => {
       const data = characters.find(
-        (character) => character.name === partyCharacter
+        (character) => character.name === partyCharacterName
       );
 
       if (data) dataArray.push(data);
@@ -81,27 +97,27 @@ const PartyViewer: React.FC = () => {
   };
 
   // stateから検索したキャラクターの実データ これをレンダリングに使う
-  const myCharacterData = characters.find(
-    (character) => character.name === myCharacter
+  const myCharacter = characters.find(
+    (character) => character.name === myCharacterName
   );
-  const partyCharactersData = findPartyCharactersData();
+  const partyCharacters = findPartyCharactersData();
   // 選択したキャラクターをマイキャラクターとして設定
   const handleSelectMyCharacter = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
-    dispatch(setMyCharacter(value));
+    dispatch(setMyCharacterName(value));
   };
   // パーティ追加対象のキャラクターを選択
   const handleSelectPartyCharacter = (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const { value } = e.target;
-    dispatch(selectPartyCharacter(value));
+    dispatch(selectPartyCharacterName(value));
   };
   // 選択したキャラクターをパーティに追加
   const handleAddPartyCharacters = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const addedParty = [...partyCharacters, selectedCharacter];
-    dispatch(setPartyCharacters(addedParty));
+    const addedParty = [...partyCharacterNames, selectedCharacterName];
+    dispatch(setPartyCharacterNames(addedParty));
   };
   // 技能表示のタブ切り替え
   const handleChangeSkillTab = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,7 +139,7 @@ const PartyViewer: React.FC = () => {
       alert('入力値が不正です。数値のみが入力できます');
       return;
     }
-    if (!myCharacterData) {
+    if (!myCharacter) {
       alert(
         'マイキャラクターが設定されていません。もしこのエラーが出たら開発チームまでご連絡ください'
       );
@@ -133,13 +149,13 @@ const PartyViewer: React.FC = () => {
     const valueInt = parseInt(value, 10);
     const updateParam = {
       [paramType]: {
-        ...myCharacterData[paramType],
+        ...myCharacter[paramType],
         current: valueInt,
       },
     };
 
     // Firestoreを更新
-    firestore.collection('character').doc(myCharacter).update(updateParam);
+    firestore.collection('character').doc(myCharacterName).update(updateParam);
   };
 
   useEffect(() => {
@@ -195,8 +211,11 @@ const PartyViewer: React.FC = () => {
           </option>
         ))}
       </select>
-      <form onSubmit={(e) => handleAddPartyCharacters(e)}>
-        <p>パーティに追加:</p>
+      <PartyForm onSubmit={(e) => handleAddPartyCharacters(e)}>
+        <p>
+          パーティに追加
+          (自分以外のキャラクターの情報が閲覧できます。リストはローカルでのみ表示されるので、他人とは同期しません):
+        </p>
         <select onChange={(e) => handleSelectPartyCharacter(e)}>
           <option value="">選択してください</option>
           {characters.map((character) => (
@@ -209,53 +228,55 @@ const PartyViewer: React.FC = () => {
           ))}
         </select>
         <button type="submit">追加</button>
-      </form>
+      </PartyForm>
       {/* TODO: 省略して書け */}
-      <p>技能表示</p>
-      <input
-        type="radio"
-        name="skill"
-        value="combat"
-        checked={skillTab === 'combat'}
-        onChange={(e) => handleChangeSkillTab(e)}
-      />
-      <span>戦闘系</span>
-      <input
-        type="radio"
-        name="skill"
-        value="explore"
-        checked={skillTab === 'explore'}
-        onChange={(e) => handleChangeSkillTab(e)}
-      />
-      <span>探索系</span>
-      <input
-        type="radio"
-        name="skill"
-        value="behavior"
-        checked={skillTab === 'behavior'}
-        onChange={(e) => handleChangeSkillTab(e)}
-      />
-      <span>行動系</span>
-      <input
-        type="radio"
-        name="skill"
-        value="negotiation"
-        checked={skillTab === 'negotiation'}
-        onChange={(e) => handleChangeSkillTab(e)}
-      />
-      <span>交渉系</span>
-      <input
-        type="radio"
-        name="skill"
-        value="knowledge"
-        checked={skillTab === 'knowledge'}
-        onChange={(e) => handleChangeSkillTab(e)}
-      />
-      <span>知識系</span>
-      {myCharacterData && (
+      <SkillTab>
+        <p>技能表示</p>
+        <input
+          type="radio"
+          name="skill"
+          value="combat"
+          checked={skillTab === 'combat'}
+          onChange={(e) => handleChangeSkillTab(e)}
+        />
+        <span>戦闘系</span>
+        <input
+          type="radio"
+          name="skill"
+          value="explore"
+          checked={skillTab === 'explore'}
+          onChange={(e) => handleChangeSkillTab(e)}
+        />
+        <span>探索系</span>
+        <input
+          type="radio"
+          name="skill"
+          value="behavior"
+          checked={skillTab === 'behavior'}
+          onChange={(e) => handleChangeSkillTab(e)}
+        />
+        <span>行動系</span>
+        <input
+          type="radio"
+          name="skill"
+          value="negotiation"
+          checked={skillTab === 'negotiation'}
+          onChange={(e) => handleChangeSkillTab(e)}
+        />
+        <span>交渉系</span>
+        <input
+          type="radio"
+          name="skill"
+          value="knowledge"
+          checked={skillTab === 'knowledge'}
+          onChange={(e) => handleChangeSkillTab(e)}
+        />
+        <span>知識系</span>
+      </SkillTab>
+      {myCharacter && (
         <StatusCard>
           <p>自分のキャラクター</p>
-          <p>{myCharacterData.name}</p>
+          <p>{myCharacter.name}</p>
           {/* TODO: もうちょっとどうにかしろ */}
           <ParamsTable>
             <thead>
@@ -280,52 +301,52 @@ const PartyViewer: React.FC = () => {
                 <td>
                   <input
                     type="number"
-                    min="0"
-                    max={myCharacterData.hp.max}
-                    value={myCharacterData.hp.current}
+                    min={0}
+                    max={myCharacter.hp.max}
+                    value={myCharacter.hp.current}
                     onChange={(e) => handleChangeCurrentParam(e, 'hp')}
                   />{' '}
-                  / {myCharacterData.hp.max}
+                  / {myCharacter.hp.max}
                 </td>
                 <td>
                   <input
                     type="number"
-                    min="0"
-                    max={myCharacterData.mp.max}
-                    value={myCharacterData.mp.current}
+                    min={0}
+                    max={myCharacter.mp.max}
+                    value={myCharacter.mp.current}
                     onChange={(e) => handleChangeCurrentParam(e, 'mp')}
                   />{' '}
-                  / {myCharacterData.mp.max}
+                  / {myCharacter.mp.max}
                 </td>
                 <td>
                   <input
                     type="number"
                     min="0"
-                    max={myCharacterData.san.max}
-                    value={myCharacterData.san.current}
+                    max={myCharacter.san.max}
+                    value={myCharacter.san.current}
                     onChange={(e) => handleChangeCurrentParam(e, 'san')}
                   />{' '}
-                  / {myCharacterData.san.max}
+                  / {myCharacter.san.max}
                   <br />
-                  不定の狂気: {myCharacterData.san.madness}
+                  不定の狂気: {myCharacter.san.madness}
                 </td>
-                <td>{myCharacterData.str}</td>
-                <td>{myCharacterData.con}</td>
-                <td>{myCharacterData.pow}</td>
-                <td>{myCharacterData.dex}</td>
-                <td>{myCharacterData.app}</td>
-                <td>{myCharacterData.siz}</td>
-                <td>{myCharacterData.int}</td>
-                <td>{myCharacterData.edu}</td>
-                <td>{myCharacterData.luck}</td>
-                <td>{myCharacterData.idea}</td>
+                <td>{myCharacter.str}</td>
+                <td>{myCharacter.con}</td>
+                <td>{myCharacter.pow}</td>
+                <td>{myCharacter.dex}</td>
+                <td>{myCharacter.app}</td>
+                <td>{myCharacter.siz}</td>
+                <td>{myCharacter.int}</td>
+                <td>{myCharacter.edu}</td>
+                <td>{myCharacter.luck}</td>
+                <td>{myCharacter.idea}</td>
               </tr>
             </tbody>
           </ParamsTable>
-          <SkillText>{myCharacterData.skill[skillTab]}</SkillText>
+          <SkillText>{myCharacter.skill[skillTab]}</SkillText>
         </StatusCard>
       )}
-      {partyCharactersData.map((partyCharacter) => (
+      {partyCharacters.map((partyCharacter) => (
         <StatusCard key={`partyCharacter-${partyCharacter.name}`}>
           <p>{partyCharacter.name}</p>
           <ParamsTable>

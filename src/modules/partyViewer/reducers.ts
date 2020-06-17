@@ -4,18 +4,18 @@ import { Character } from '../characterMaker/reducers';
 
 export interface PartyViewerState {
   characters: Character[];
-  myCharacter: string;
-  selectedCharacter: string;
-  partyCharacters: string[];
+  myCharacterName: string;
+  selectedCharacterName: string;
+  partyCharacterNames: string[];
   skillTab: string;
 }
 
 // stateの初期化
 const initialState: PartyViewerState = {
   characters: [],
-  myCharacter: '',
-  selectedCharacter: '',
-  partyCharacters: [],
+  myCharacterName: '',
+  selectedCharacterName: '',
+  partyCharacterNames: [],
   skillTab: 'combat',
 };
 
@@ -32,22 +32,22 @@ const partyViewer = (
         characters: action.payload,
       };
     }
-    case types.SET_MY_CHARACTER: {
+    case types.SET_MY_CHARACTER_NAME: {
       return {
         ...state,
-        myCharacter: action.payload,
+        myCharacterName: action.payload,
       };
     }
-    case types.SELECT_PARTY_CHARACTER: {
+    case types.SELECT_PARTY_CHARACTER_NAME: {
       return {
         ...state,
-        selectedCharacter: action.payload,
+        selectedCharacterName: action.payload,
       };
     }
-    case types.SET_PARTY_CHARACTERS: {
+    case types.SET_PARTY_CHARACTER_NAMES: {
       return {
         ...state,
-        partyCharacters: action.payload,
+        partyCharacterNames: action.payload,
       };
     }
     case types.SELECT_SKILL_TAB: {
