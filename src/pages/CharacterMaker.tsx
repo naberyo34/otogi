@@ -33,7 +33,7 @@ const CharacterMaker: React.FC = () => {
    */
   const handleEditSkill = (
     e: React.ChangeEvent<HTMLTextAreaElement>,
-    skillType: 'combat' | 'explore' | 'behavior' | 'negotation' | 'knowledge'
+    skillType: 'combat' | 'explore' | 'behavior' | 'negotiation' | 'knowledge'
   ) => {
     const { value } = e.target;
     const newSkill = {
@@ -118,7 +118,7 @@ const CharacterMaker: React.FC = () => {
         <textarea
           data-skill="negotiation"
           placeholder="交渉系技能をコピペしてください"
-          onChange={(e) => handleEditSkill(e, 'negotation')}
+          onChange={(e) => handleEditSkill(e, 'negotiation')}
         />
         <textarea
           data-skill="knowledge"
