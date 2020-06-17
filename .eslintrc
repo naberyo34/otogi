@@ -42,6 +42,7 @@
     "sourceType": "module"
   },
   "rules": {
+    "no-alert": 0, // UIを本格的に整備するまではとりあえず使いたい
     "jsx-a11y/no-onchange": "off", // さすがに厳しすぎるしコストに見合わない
     "react/jsx-filename-extension": [
       "error",
