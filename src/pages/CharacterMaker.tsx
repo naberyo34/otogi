@@ -10,7 +10,7 @@ import { State } from '../modules/index';
 import InputCharacterParams from '../components/characterMaker/InputCharacterParams';
 
 const Wrapper = styled.section`
-  margin-top: 32px;
+  padding: 16px;
   font-size: 1.6rem;
 `;
 
@@ -26,14 +26,18 @@ const CharacterMaker: React.FC = () => {
     dispatch(setCharacterName(value));
   };
 
-  // 技能欄に入力した内容をStoreにも反映
-  const handleEditSkill = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  /**
+   * 技能欄に入力した内容をStoreにも反映
+   * @param e イベント
+   * @param skillType オブジェクトキーに使うスキルの名称 (ex: 'combat'など)
+   */
+  const handleEditSkill = (
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+    skillType: 'combat' | 'explore' | 'behavior' | 'negotation' | 'knowledge'
+  ) => {
     const { value } = e.target;
-    // MEMO: anyつけないと下記の'計算されたプロパティ名'が使えなくなる
-    // https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Operators/Object_initializer
-    const targetSkill: any = e.target.getAttribute('data-skill');
     const newSkill = {
-      [targetSkill]: value,
+      [skillType]: value,
     };
 
     dispatch(setCharacterSkill(newSkill));
@@ -58,8 +62,7 @@ const CharacterMaker: React.FC = () => {
       current: newCharacter.pow * 5,
       madness: newCharacter.pow * 4,
     };
-    // TODO: 何もluckとかまでStoreに入れ直す必要がないことに気づいた
-    // Characterインターフェースとは別にStore用のインターフェースを用意したほうがよさそう
+    // TODO: 何もluckとかまでStoreに入れ直す必要はないことに気づいた
     const submitCharacter = {
       ...newCharacter,
       luck,
@@ -85,7 +88,9 @@ const CharacterMaker: React.FC = () => {
       <h2>キャラクターメーカー (beta ver.)</h2>
       <p>※いまのところクトゥルフ神話TRPG 旧ルールフォーマットのみ対応</p>
       <p>
-        実装に時間食いそうなので、一旦よそで作ってパラメータブチ込む形とさせてくれ
+        開発中のため、他サービスで作成済のキャラクターを投入するしかできません。
+        <br />
+        また、技能パラメータはテキストコピペ形式になっています(改良予定)。
       </p>
       <form onSubmit={(e) => handleSubmit(e)}>
         <span>プレイヤー名:</span>
@@ -97,29 +102,28 @@ const CharacterMaker: React.FC = () => {
         <InputCharacterParams />
         <span>ステータス:</span>
         <textarea
-          data-skill="combat"
-          placeholder="戦闘系技能をコピペしてね"
-          onChange={(e) => handleEditSkill(e)}
+          placeholder="戦闘系技能をコピペしてください"
+          onChange={(e) => handleEditSkill(e, 'combat')}
         />
         <textarea
           data-skill="explore"
-          placeholder="探索系技能をコピペしてね"
-          onChange={(e) => handleEditSkill(e)}
+          placeholder="探索系技能をコピペしてください"
+          onChange={(e) => handleEditSkill(e, 'explore')}
         />
         <textarea
           data-skill="behavior"
-          placeholder="行動系技能をコピペしてね"
-          onChange={(e) => handleEditSkill(e)}
+          placeholder="行動系技能をコピペしてください"
+          onChange={(e) => handleEditSkill(e, 'behavior')}
         />
         <textarea
           data-skill="negotiation"
-          placeholder="交渉系技能をコピペしてね"
-          onChange={(e) => handleEditSkill(e)}
+          placeholder="交渉系技能をコピペしてください"
+          onChange={(e) => handleEditSkill(e, 'negotation')}
         />
         <textarea
           data-skill="knowledge"
-          placeholder="知識系技能をコピペしてね"
-          onChange={(e) => handleEditSkill(e)}
+          placeholder="知識系技能をコピペしてください"
+          onChange={(e) => handleEditSkill(e, 'knowledge')}
         />
         <input type="submit" value="作成!" />
       </form>
