@@ -1,4 +1,5 @@
 import types from './actionTypes';
+import { Skill } from '../../services/skills/combatSkills';
 
 // MEMO: FSA準拠の書き方
 export interface Action {
@@ -18,7 +19,7 @@ export const setCharacterParams = (payload: any): Action => ({
   payload,
 });
 
-export const setCharacterSkill = (payload: any): Action => ({
-  type: types.SET_CHARACTER_SKILL,
+export const setCharacterSkills = (payload: Skill[]): Action => ({
+  type: types.SET_CHARACTER_SKILLS,
   payload,
 });

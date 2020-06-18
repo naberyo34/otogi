@@ -1,5 +1,14 @@
+export type ParamType =
+  | 'STR'
+  | 'CON'
+  | 'POW'
+  | 'DEX'
+  | 'APP'
+  | 'SIZ'
+  | 'INT'
+  | 'EDU';
 interface Ability {
-  name: string;
+  name: ParamType;
   min: number;
   max: number;
 }

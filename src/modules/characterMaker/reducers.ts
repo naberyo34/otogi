@@ -1,5 +1,10 @@
 import { Action } from './actions';
 import types from './actionTypes';
+import combatSkills, { Skill } from '../../services/skills/combatSkills';
+import exploreSkills from '../../services/skills/exploreSkills';
+import behaviorSkills from '../../services/skills/behaviorSkills';
+import negotiationSkills from '../../services/skills/negotiationSkills';
+import knowledgeSkills from '../../services/skills/knowledgeSkills';
 
 interface VariableParams {
   max: number;
@@ -8,16 +13,6 @@ interface VariableParams {
 
 interface San extends VariableParams {
   madness: number;
-}
-
-interface Skill {
-  combat: string;
-  explore: string;
-  behavior: string;
-  negotiation: string;
-  knowledge: string;
-  // 何を指定しようがstringが返ってくる
-  [key: string]: string;
 }
 
 export interface Character {
@@ -36,15 +31,13 @@ export interface Character {
   hp: VariableParams;
   mp: VariableParams;
   san: San;
-  skill: Skill;
-  // 変数でキーを参照したときに怒られないよう、全パターンを列挙
-  [key: string]: string | number | VariableParams | San | Skill;
+  combatSkills: Skill[];
+  exploreSkills: Skill[];
+  behaviorSkills: Skill[];
+  negotiationSkills: Skill[];
+  knowledgeSkills: Skill[];
+  [key: string]: any; // 仕方なかった
 }
-
-// export interface Status {
-//   name: string;
-//   value: string;
-// }
 
 // 初期パラメータとして挿入されるキャラクターのデータ(すべて最低値)
 export const initialCharacter: Character = {
@@ -80,13 +73,11 @@ export const initialCharacter: Character = {
     // max - (max / 5)
     madness: 12,
   },
-  skill: {
-    combat: '',
-    explore: '',
-    behavior: '',
-    negotiation: '',
-    knowledge: '',
-  },
+  combatSkills,
+  exploreSkills,
+  behaviorSkills,
+  negotiationSkills,
+  knowledgeSkills,
 };
 
 export interface CharacterMakerState {
@@ -127,16 +118,10 @@ const characterMaker = (
       };
     }
     // 技能欄に入力したとき
-    case types.SET_CHARACTER_SKILL: {
+    case types.SET_CHARACTER_SKILLS: {
       return {
         ...state,
-        character: {
-          ...state.character,
-          skill: {
-            ...state.character.skill,
-            ...action.payload,
-          },
-        },
+        ...action.payload,
       };
     }
     default:

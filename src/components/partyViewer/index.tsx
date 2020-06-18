@@ -343,7 +343,6 @@ const PartyViewer: React.FC = () => {
               </tr>
             </tbody>
           </ParamsTable>
-          <SkillText>{myCharacter.skill[skillTab]}</SkillText>
         </StatusCard>
       )}
       {partyCharacters.map((partyCharacter) => (
@@ -393,7 +392,6 @@ const PartyViewer: React.FC = () => {
               </tr>
             </tbody>
           </ParamsTable>
-          <SkillText>{partyCharacter.skill[skillTab]}</SkillText>
         </StatusCard>
       ))}
     </Wrapper>
