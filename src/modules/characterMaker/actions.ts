@@ -4,10 +4,6 @@ import { Skill } from '../../services/skills/combatSkills';
 // TODO: 依存関係が相互になってしまうので一時的にここにも書いてる
 // 型定義を別ファイルで切り出したほうがいいと想います
 
-interface Name {
-  name: string;
-}
-
 export interface FoundationParams {
   str: number;
   con: number;
@@ -26,17 +22,18 @@ export interface Action {
   error?: boolean;
 }
 
-export const setCharacterName = (payload: Name): Action => ({
+// TODO: ペイロードの形が……
+export const setCharacterName = (payload: any): Action => ({
   type: types.SET_CHARACTER_NAME,
   payload,
 });
 
-export const setCharacterParams = (payload: FoundationParams): Action => ({
+export const setCharacterParams = (payload: any): Action => ({
   type: types.SET_CHARACTER_PARAMS,
   payload,
 });
 
-export const setCharacterSkills = (payload: Skill[]): Action => ({
+export const setCharacterSkills = (payload: any): Action => ({
   type: types.SET_CHARACTER_SKILLS,
   payload,
 });

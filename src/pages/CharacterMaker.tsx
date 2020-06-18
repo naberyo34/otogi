@@ -55,28 +55,14 @@ const CharacterMaker: React.FC = () => {
       return;
     }
 
-    const luck = newCharacter.pow * 5;
-    const idea = newCharacter.int * 5;
-    const know = newCharacter.edu * 5;
-    const hp = {
-      max: Math.floor((newCharacter.con + newCharacter.siz) / 2),
-      current: Math.floor((newCharacter.con + newCharacter.siz) / 2),
-    };
-    const mp = {
-      max: newCharacter.pow,
-      current: newCharacter.pow,
-    };
-    const san = {
-      max: newCharacter.pow * 5,
-      current: newCharacter.pow * 5,
-      madness: newCharacter.pow * 4,
-    };
-    // TODO: 何もluckとかまでStoreに入れ直す必要はないことに気づいた
+    const hp = Math.floor(
+      (newCharacter.foundationParams.con + newCharacter.foundationParams.siz) /
+        2
+    );
+    const mp = newCharacter.foundationParams.pow;
+    const san = newCharacter.foundationParams.pow * 5;
     const submitCharacter = {
       ...newCharacter,
-      luck,
-      idea,
-      know,
       hp,
       mp,
       san,

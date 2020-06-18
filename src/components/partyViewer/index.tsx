@@ -291,6 +291,7 @@ const PartyViewer: React.FC = () => {
                 <th>EDU</th>
                 <th>幸運</th>
                 <th>アイデア</th>
+                <th>知識</th>
               </tr>
             </thead>
             <tbody>
@@ -328,24 +329,25 @@ const PartyViewer: React.FC = () => {
                   <input
                     type="number"
                     min="0"
-                    max={myCharacter.pow * 5}
+                    max={myCharacter.foundationParams.pow * 5}
                     value={myCharacter.san}
                     onChange={(e) => handleChangeCurrentParam(e, 'san')}
                   />{' '}
-                  / {myCharacter.pow * 5}
+                  / {myCharacter.foundationParams.pow * 5}
                   <br />
-                  不定の狂気: {myCharacter.pow * 4}
+                  不定の狂気: {myCharacter.foundationParams.pow * 4}
                 </td>
-                <td>{myCharacter.str}</td>
-                <td>{myCharacter.con}</td>
-                <td>{myCharacter.pow}</td>
-                <td>{myCharacter.dex}</td>
-                <td>{myCharacter.app}</td>
-                <td>{myCharacter.siz}</td>
-                <td>{myCharacter.int}</td>
-                <td>{myCharacter.edu}</td>
-                <td>{myCharacter.luck}</td>
-                <td>{myCharacter.idea}</td>
+                <td>{myCharacter.foundationParams.str}</td>
+                <td>{myCharacter.foundationParams.con}</td>
+                <td>{myCharacter.foundationParams.pow}</td>
+                <td>{myCharacter.foundationParams.dex}</td>
+                <td>{myCharacter.foundationParams.app}</td>
+                <td>{myCharacter.foundationParams.siz}</td>
+                <td>{myCharacter.foundationParams.int}</td>
+                <td>{myCharacter.foundationParams.edu}</td>
+                <td>{myCharacter.foundationParams.pow * 5}</td>
+                <td>{myCharacter.foundationParams.int * 5}</td>
+                <td>{myCharacter.foundationParams.edu * 5}</td>
               </tr>
             </tbody>
           </ParamsTable>
@@ -370,12 +372,18 @@ const PartyViewer: React.FC = () => {
                 <th>EDU</th>
                 <th>幸運</th>
                 <th>アイデア</th>
+                <th>知識</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>
-                  {partyCharacter.hp} / {partyCharacter.h}
+                  {partyCharacter.hp} /{' '}
+                  {Math.floor(
+                    (partyCharacter.foundationParams.con +
+                      partyCharacter.foundationParams.siz) /
+                      2
+                  )}
                 </td>
                 <td>
                   {partyCharacter.mp} / {partyCharacter.foundationParams.pow}
@@ -384,18 +392,19 @@ const PartyViewer: React.FC = () => {
                   {partyCharacter.san} /{' '}
                   {partyCharacter.foundationParams.pow * 5}
                   <br />
-                  不定の狂気: {partyCharacter.pow * 4}
+                  不定の狂気: {partyCharacter.foundationParams.pow * 4}
                 </td>
-                <td>{partyCharacter.str}</td>
-                <td>{partyCharacter.con}</td>
-                <td>{partyCharacter.pow}</td>
-                <td>{partyCharacter.dex}</td>
-                <td>{partyCharacter.app}</td>
-                <td>{partyCharacter.siz}</td>
-                <td>{partyCharacter.int}</td>
-                <td>{partyCharacter.edu}</td>
-                <td>{partyCharacter.luck}</td>
-                <td>{partyCharacter.idea}</td>
+                <td>{partyCharacter.foundationParams.str}</td>
+                <td>{partyCharacter.foundationParams.con}</td>
+                <td>{partyCharacter.foundationParams.pow}</td>
+                <td>{partyCharacter.foundationParams.dex}</td>
+                <td>{partyCharacter.foundationParams.app}</td>
+                <td>{partyCharacter.foundationParams.siz}</td>
+                <td>{partyCharacter.foundationParams.int}</td>
+                <td>{partyCharacter.foundationParams.edu}</td>
+                <td>{partyCharacter.foundationParams.pow * 5}</td>
+                <td>{partyCharacter.foundationParams.int * 5}</td>
+                <td>{partyCharacter.foundationParams.edu * 5}</td>
               </tr>
             </tbody>
           </ParamsTable>

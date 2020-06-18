@@ -51,7 +51,7 @@ const InputCharacterParams: React.FC = () => {
 
     FoundationParams[paramType] = valueInt;
 
-    dispatch(setCharacterParams(FoundationParams));
+    dispatch(setCharacterParams({ foundationParams: FoundationParams }));
   };
 
   /**
