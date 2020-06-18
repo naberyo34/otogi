@@ -14,6 +14,7 @@ import { Character } from '../../modules/characterMaker/reducers';
 
 const Wrapper = styled.section`
   width: calc(100vw - 320px);
+  min-width: 640px;
   height: 90vh;
   padding: 16px;
   overflow-y: scroll;
@@ -42,7 +43,12 @@ const StatusCard = styled.div`
   border-radius: 4px;
 `;
 
+const CardName = styled.h3`
+  font-size: 1.6rem;
+`;
+
 const ParamsTable = styled.table`
+  margin-top: 8px;
   font-size: 1.2rem;
   border: 2px solid gray;
   thead {
@@ -55,7 +61,11 @@ const ParamsTable = styled.table`
   }
   td {
     padding: 4px;
+    line-height: 1.5;
     border: 2px solid gray;
+  }
+  input {
+    width: 40px;
   }
 `;
 
@@ -272,8 +282,8 @@ const PartyViewer: React.FC = () => {
       </SkillTab>
       {myCharacter && (
         <StatusCard>
-          <p>自分のキャラクター</p>
-          <p>{myCharacter.name}</p>
+          <p>マイキャラクター</p>
+          <CardName>{myCharacter.name}</CardName>
           {/* TODO: もうちょっとどうにかしろ */}
           <ParamsTable>
             <thead>
@@ -335,7 +345,7 @@ const PartyViewer: React.FC = () => {
                   />{' '}
                   / {myCharacter.foundationParams.pow * 5}
                   <br />
-                  不定の狂気: {myCharacter.foundationParams.pow * 4}
+                  不定: {myCharacter.foundationParams.pow * 4}
                 </td>
                 <td>{myCharacter.foundationParams.str}</td>
                 <td>{myCharacter.foundationParams.con}</td>
@@ -355,7 +365,7 @@ const PartyViewer: React.FC = () => {
       )}
       {partyCharacters.map((partyCharacter) => (
         <StatusCard key={`partyCharacter-${partyCharacter.name}`}>
-          <p>{partyCharacter.name}</p>
+          <CardName>{partyCharacter.name}</CardName>
           <ParamsTable>
             <thead>
               <tr>
@@ -392,7 +402,7 @@ const PartyViewer: React.FC = () => {
                   {partyCharacter.san} /{' '}
                   {partyCharacter.foundationParams.pow * 5}
                   <br />
-                  不定の狂気: {partyCharacter.foundationParams.pow * 4}
+                  不定: {partyCharacter.foundationParams.pow * 4}
                 </td>
                 <td>{partyCharacter.foundationParams.str}</td>
                 <td>{partyCharacter.foundationParams.con}</td>

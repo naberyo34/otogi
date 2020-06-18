@@ -37,19 +37,19 @@ const Title = styled.h3`
 const Table = styled.table`
   margin-top: 8px;
   font-size: 1.2rem;
-  border: 2px solid black;
+  border: 2px solid gray;
   thead {
     color: white;
-    background: black;
+    background: gray;
   }
   th {
     width: 60px;
     padding: 4px;
-    border: 2px solid black;
+    border: 2px solid gray;
   }
   td {
     padding: 4px;
-    border: 2px solid black;
+    border: 2px solid gray;
   }
   input {
     width: 60px;

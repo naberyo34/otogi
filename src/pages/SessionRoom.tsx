@@ -5,6 +5,7 @@ import PartyViewer from '../components/partyViewer';
 
 const Wrapper = styled.section`
   display: flex;
+  min-width: 960px;
 `;
 
 const SessionRoom: React.FC = () => {
