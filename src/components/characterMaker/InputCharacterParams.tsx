@@ -1,8 +1,9 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import abilities, { ParamType } from '../../services/abilities';
 import { setCharacterParams } from '../../modules/characterMaker/actions';
+import { State } from '../../modules';
 
 const Wrapper = styled.section`
   margin-top: 32px;
@@ -37,6 +38,9 @@ const Table = styled.table`
 
 const InputCharacterParams: React.FC = () => {
   const dispatch = useDispatch();
+  const FoundationParams = useSelector(
+    (state: State) => state.characterMaker.character.foundationParams
+  );
   // 値を変更したときにStoreを更新する
   const handleChooseParams = (
     e: React.ChangeEvent<HTMLSelectElement>,
@@ -45,11 +49,9 @@ const InputCharacterParams: React.FC = () => {
     const { value } = e.target;
     const valueInt = parseInt(value, 10);
 
-    const changeParam = {
-      [paramType]: valueInt,
-    };
+    FoundationParams[paramType] = valueInt;
 
-    dispatch(setCharacterParams(changeParam));
+    dispatch(setCharacterParams(FoundationParams));
   };
 
   /**
@@ -91,7 +93,9 @@ const InputCharacterParams: React.FC = () => {
 
   // 配列abilitiesの情報を元に、JSXElementの配列を作成
   abilities.forEach((ability) => {
-    const thElement = <th key={`th-${ability.name}`}>{ability.name}</th>;
+    const thElement = (
+      <th key={`th-${ability.name}`}>{ability.name.toUpperCase()}</th>
+    );
     const tdElement = (
       <td key={`td-${ability.name}`}>
         {generateSelectBox(ability.name, ability.min, ability.max)}

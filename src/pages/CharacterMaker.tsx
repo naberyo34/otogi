@@ -40,7 +40,10 @@ const CharacterMaker: React.FC = () => {
   // 名前欄に入力した内容をStoreにも反映
   const handleEditName = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    dispatch(setCharacterName(value));
+    const newName = {
+      name: value,
+    };
+    dispatch(setCharacterName(newName));
   };
 
   // 計算が必要な能力値をすべて算出し, Firestoreに格納

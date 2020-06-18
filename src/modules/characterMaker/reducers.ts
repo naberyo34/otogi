@@ -6,17 +6,7 @@ import behaviorSkills from '../../services/skills/behaviorSkills';
 import negotiationSkills from '../../services/skills/negotiationSkills';
 import knowledgeSkills from '../../services/skills/knowledgeSkills';
 
-interface VariableParams {
-  max: number;
-  current: number;
-}
-
-interface San extends VariableParams {
-  madness: number;
-}
-
-export interface Character {
-  name: string;
+export interface FoundationParams {
   str: number;
   con: number;
   pow: number;
@@ -25,12 +15,15 @@ export interface Character {
   siz: number;
   int: number;
   edu: number;
-  luck: number;
-  idea: number;
-  know: number;
-  hp: VariableParams;
-  mp: VariableParams;
-  san: San;
+}
+
+// MEMO: 計算で出る値はわざわざ保存しない方針としている
+export interface Character {
+  name: string;
+  foundationParams: FoundationParams;
+  hp: number; // 最大値ではなく現在値
+  mp: number; // 同上
+  san: number; // 同上
   combatSkills: Skill[];
   exploreSkills: Skill[];
   behaviorSkills: Skill[];
@@ -42,37 +35,19 @@ export interface Character {
 // 初期パラメータとして挿入されるキャラクターのデータ(すべて最低値)
 export const initialCharacter: Character = {
   name: '',
-  str: 3,
-  con: 3,
-  pow: 3,
-  dex: 3,
-  app: 3,
-  siz: 8,
-  int: 8,
-  edu: 6,
-  // POW * 5
-  luck: 15,
-  // INT * 5
-  idea: 40,
-  // EDU * 5
-  know: 30,
-  // CON + SIZ / 2 (切り捨て)
-  hp: {
-    max: 5,
-    current: 5,
+  foundationParams: {
+    str: 3,
+    con: 3,
+    pow: 3,
+    dex: 3,
+    app: 3,
+    siz: 8,
+    int: 8,
+    edu: 6,
   },
-  // POW
-  mp: {
-    max: 3,
-    current: 3,
-  },
-  // POW * 5
-  san: {
-    max: 15,
-    current: 15,
-    // max - (max / 5)
-    madness: 12,
-  },
+  hp: 5,
+  mp: 3,
+  san: 15,
   combatSkills,
   exploreSkills,
   behaviorSkills,
@@ -98,12 +73,10 @@ const characterMaker = (
     // 名前を入力したとき
     case types.SET_CHARACTER_NAME: {
       return {
-        // character以外のstateは変更しない
         ...state,
         character: {
-          // characterも指定要素以外は変更しない
           ...state.character,
-          name: action.payload,
+          ...action.payload,
         },
       };
     }
@@ -121,7 +94,10 @@ const characterMaker = (
     case types.SET_CHARACTER_SKILLS: {
       return {
         ...state,
-        ...action.payload,
+        character: {
+          ...state.character,
+          ...action.payload,
+        },
       };
     }
     default:

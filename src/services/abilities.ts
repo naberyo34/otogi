@@ -1,12 +1,12 @@
 export type ParamType =
-  | 'STR'
-  | 'CON'
-  | 'POW'
-  | 'DEX'
-  | 'APP'
-  | 'SIZ'
-  | 'INT'
-  | 'EDU';
+  | 'str'
+  | 'con'
+  | 'pow'
+  | 'dex'
+  | 'app'
+  | 'siz'
+  | 'int'
+  | 'edu';
 interface Ability {
   name: ParamType;
   min: number;
@@ -16,42 +16,42 @@ interface Ability {
 // 能力値の名前と、想定しうる最大/最小値
 const abilities: Ability[] = [
   {
-    name: 'STR',
+    name: 'str',
     min: 3,
     max: 18,
   },
   {
-    name: 'CON',
+    name: 'con',
     min: 3,
     max: 18,
   },
   {
-    name: 'POW',
+    name: 'pow',
     min: 3,
     max: 18,
   },
   {
-    name: 'DEX',
+    name: 'dex',
     min: 3,
     max: 18,
   },
   {
-    name: 'APP',
+    name: 'app',
     min: 3,
     max: 18,
   },
   {
-    name: 'SIZ',
+    name: 'siz',
     min: 8,
     max: 18,
   },
   {
-    name: 'INT',
+    name: 'int',
     min: 8,
     max: 18,
   },
   {
-    name: 'EDU',
+    name: 'edu',
     min: 6,
     max: 21,
   },

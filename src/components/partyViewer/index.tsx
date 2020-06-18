@@ -82,7 +82,7 @@ const PartyViewer: React.FC = () => {
    * partyCharacters(String[])から実データ(Character[])を生成
    * @returns パーティメンバーの情報が格納された配列
    */
-  const findPartyCharactersData = () => {
+  const findPartyCharactersData = (): Character[] => {
     const dataArray: Character[] = [];
 
     partyCharacterNames.forEach((partyCharacterName) => {
@@ -100,7 +100,7 @@ const PartyViewer: React.FC = () => {
   const myCharacter = characters.find(
     (character) => character.name === myCharacterName
   );
-  const partyCharacters = findPartyCharactersData();
+  const partyCharacters: Character[] = findPartyCharactersData();
   // 選択したキャラクターをマイキャラクターとして設定
   const handleSelectMyCharacter = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
@@ -148,10 +148,7 @@ const PartyViewer: React.FC = () => {
 
     const valueInt = parseInt(value, 10);
     const updateParam = {
-      [paramType]: {
-        ...myCharacter[paramType],
-        current: valueInt,
-      },
+      [paramType]: valueInt,
     };
 
     // Firestoreを更新
@@ -302,33 +299,42 @@ const PartyViewer: React.FC = () => {
                   <input
                     type="number"
                     min={0}
-                    max={myCharacter.hp.max}
-                    value={myCharacter.hp.current}
+                    max={Math.floor(
+                      (myCharacter.foundationParams.con +
+                        myCharacter.foundationParams.siz) /
+                        2
+                    )}
+                    value={myCharacter.hp}
                     onChange={(e) => handleChangeCurrentParam(e, 'hp')}
                   />{' '}
-                  / {myCharacter.hp.max}
+                  /{' '}
+                  {Math.floor(
+                    (myCharacter.foundationParams.con +
+                      myCharacter.foundationParams.siz) /
+                      2
+                  )}
                 </td>
                 <td>
                   <input
                     type="number"
                     min={0}
-                    max={myCharacter.mp.max}
-                    value={myCharacter.mp.current}
+                    max={myCharacter.foundationParams.pow}
+                    value={myCharacter.mp}
                     onChange={(e) => handleChangeCurrentParam(e, 'mp')}
                   />{' '}
-                  / {myCharacter.mp.max}
+                  / {myCharacter.foundationParams.pow}
                 </td>
                 <td>
                   <input
                     type="number"
                     min="0"
-                    max={myCharacter.san.max}
-                    value={myCharacter.san.current}
+                    max={myCharacter.pow * 5}
+                    value={myCharacter.san}
                     onChange={(e) => handleChangeCurrentParam(e, 'san')}
                   />{' '}
-                  / {myCharacter.san.max}
+                  / {myCharacter.pow * 5}
                   <br />
-                  不定の狂気: {myCharacter.san.madness}
+                  不定の狂気: {myCharacter.pow * 4}
                 </td>
                 <td>{myCharacter.str}</td>
                 <td>{myCharacter.con}</td>
@@ -369,15 +375,16 @@ const PartyViewer: React.FC = () => {
             <tbody>
               <tr>
                 <td>
-                  {partyCharacter.hp.current} / {partyCharacter.hp.max}
+                  {partyCharacter.hp} / {partyCharacter.h}
                 </td>
                 <td>
-                  {partyCharacter.mp.current} / {partyCharacter.mp.max}
+                  {partyCharacter.mp} / {partyCharacter.foundationParams.pow}
                 </td>
                 <td>
-                  {partyCharacter.san.current} / {partyCharacter.san.max}
+                  {partyCharacter.san} /{' '}
+                  {partyCharacter.foundationParams.pow * 5}
                   <br />
-                  不定の狂気: {partyCharacter.san.madness}
+                  不定の狂気: {partyCharacter.pow * 4}
                 </td>
                 <td>{partyCharacter.str}</td>
                 <td>{partyCharacter.con}</td>
