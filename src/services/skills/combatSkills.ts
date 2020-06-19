@@ -1,8 +1,4 @@
-export interface Skill {
-  name: string;
-  annotation?: string;
-  point: number;
-}
+import Skill from 'interfaces/skill';
 
 // MEMO: 一旦キャラクター保管所を正として作成
 // https://charasheet.vampire-blood.net/coc_pc_making.html

@@ -1,12 +1,6 @@
-import types from './actionTypes';
-import { Character } from '../characterMaker/reducers';
-
-// MEMO: FSA準拠の書き方
-export interface Action {
-  type: string;
-  payload?: any;
-  error?: boolean;
-}
+import types from 'modules/partyViewer/actionTypes';
+import Action from 'interfaces/action';
+import Character from 'interfaces/character';
 
 export const getCharacters = (payload: Character[]): Action => ({
   type: types.GET_CHARACTERS,

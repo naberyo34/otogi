@@ -1,11 +1,11 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { firestore } from '../services/firebase';
-import { setCharacterName } from '../modules/characterMaker/actions';
-import { State } from '../modules/index';
-import InputCharacterParams from '../components/characterMaker/InputCharacterParams';
-import InputCharacterSkills from '../components/characterMaker/InputCharacterSkills';
+import { firestore } from 'services/firebase';
+import { setCharacterName } from 'modules/characterMaker/actions';
+import { State } from 'modules';
+import InputCharacterParams from 'components/characterMaker/InputCharacterParams';
+import InputCharacterSkills from 'components/characterMaker/InputCharacterSkills';
 
 const Wrapper = styled.section`
   width: 100vw;

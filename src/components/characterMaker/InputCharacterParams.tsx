@@ -1,9 +1,10 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import abilities, { ParamType } from '../../services/abilities';
-import { setCharacterParams } from '../../modules/characterMaker/actions';
-import { State } from '../../modules';
+import { State } from 'modules';
+import { setCharacterParams } from 'modules/characterMaker/actions';
+import { ParamType } from 'interfaces/param';
+import params from 'services/params';
 
 const Wrapper = styled.section`
   margin-top: 32px;
@@ -91,14 +92,14 @@ const InputCharacterParams: React.FC = () => {
   const tableHead: JSX.Element[] = [];
   const tableData: JSX.Element[] = [];
 
-  // 配列abilitiesの情報を元に、JSXElementの配列を作成
-  abilities.forEach((ability) => {
+  // 配列paramsの情報を元に、JSXElementの配列を作成
+  params.forEach((param) => {
     const thElement = (
-      <th key={`th-${ability.name}`}>{ability.name.toUpperCase()}</th>
+      <th key={`th-${param.name}`}>{param.name.toUpperCase()}</th>
     );
     const tdElement = (
-      <td key={`td-${ability.name}`}>
-        {generateSelectBox(ability.name, ability.min, ability.max)}
+      <td key={`td-${param.name}`}>
+        {generateSelectBox(param.name, param.min, param.max)}
       </td>
     );
 

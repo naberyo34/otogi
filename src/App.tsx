@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { BrowserRouter, Route, Link } from 'react-router-dom';
-import SessionRoom from './pages/SessionRoom';
-import CharacterMaker from './pages/CharacterMaker';
+import SessionRoom from 'pages/SessionRoom';
+import CharacterMaker from 'pages/CharacterMaker';
 
 const MainMenu = styled.section`
   padding: 16px;

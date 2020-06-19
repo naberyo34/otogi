@@ -1,5 +1,5 @@
-import { Action } from './actions';
-import types from './actionTypes';
+import types from 'modules/realTimeDice/actionTypes';
+import Action from 'interfaces/action';
 
 // stateの型定義
 export interface RealTimeDiceState {

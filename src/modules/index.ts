@@ -1,7 +1,9 @@
 import { combineReducers } from 'redux';
-import realTimeDice, { RealTimeDiceState } from './realTimeDice/reducers';
-import partyViewer, { PartyViewerState } from './partyViewer/reducers';
-import characterMaker, { CharacterMakerState } from './characterMaker/reducers';
+import realTimeDice, { RealTimeDiceState } from 'modules/realTimeDice/reducers';
+import partyViewer, { PartyViewerState } from 'modules/partyViewer/reducers';
+import characterMaker, {
+  CharacterMakerState,
+} from 'modules/characterMaker/reducers';
 
 // 全Stateを結合
 export interface State {

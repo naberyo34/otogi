@@ -1,4 +1,4 @@
-import { Skill } from './combatSkills';
+import Skill from 'interfaces/skill';
 
 const exploreSkills: Skill[] = [
   {

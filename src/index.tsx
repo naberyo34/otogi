@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { createGlobalStyle } from 'styled-components';
 import 'minireset.css';
-import configureStore from './store/configureStore';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import configureStore from 'store/configureStore';
+import App from 'App';
+import * as serviceWorker from 'serviceWorker';
 
 const GlobalStyle = createGlobalStyle`
   html {

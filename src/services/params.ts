@@ -1,20 +1,7 @@
-export type ParamType =
-  | 'str'
-  | 'con'
-  | 'pow'
-  | 'dex'
-  | 'app'
-  | 'siz'
-  | 'int'
-  | 'edu';
-interface Ability {
-  name: ParamType;
-  min: number;
-  max: number;
-}
+import Param from 'interfaces/param';
 
 // 能力値の名前と、想定しうる最大/最小値
-const abilities: Ability[] = [
+const params: Param[] = [
   {
     name: 'str',
     min: 3,
@@ -57,4 +44,4 @@ const abilities: Ability[] = [
   },
 ];
 
-export default abilities;
+export default params;

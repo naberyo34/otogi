@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { firestore } from '../../services/firebase';
+import { firestore } from 'services/firebase';
+import { State } from 'modules';
 import {
   getCharacters,
   setMyCharacterName,
   selectPartyCharacterName,
   setPartyCharacterNames,
   selectSkillTab,
-} from '../../modules/partyViewer/actions';
-import { State } from '../../modules/index';
-import { Character } from '../../modules/characterMaker/reducers';
+} from 'modules/partyViewer/actions';
+import Character from 'interfaces/character';
 
 const Wrapper = styled.section`
   width: calc(100vw - 320px);
@@ -68,10 +68,6 @@ const ParamsTable = styled.table`
   input {
     width: 40px;
   }
-`;
-
-const SkillText = styled.p`
-  font-size: 1.2rem;
 `;
 
 const PartyViewer: React.FC = () => {
@@ -367,7 +363,10 @@ const PartyViewer: React.FC = () => {
               <thead>
                 <tr>
                   {myCharacter.combatSkills.map((skill) => (
-                    <th key={`myCharacter-${skill.name}`}>{skill.name}</th>
+                    <th key={`myCharacter-${skill.name}`}>
+                      {skill.name}
+                      {skill.annotation && `(${skill.annotation})`}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -387,7 +386,10 @@ const PartyViewer: React.FC = () => {
               <thead>
                 <tr>
                   {myCharacter.exploreSkills.map((skill) => (
-                    <th key={`myCharacter-${skill.name}`}>{skill.name}</th>
+                    <th key={`myCharacter-${skill.name}`}>
+                      {skill.name}
+                      {skill.annotation && `(${skill.annotation})`}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -407,7 +409,10 @@ const PartyViewer: React.FC = () => {
               <thead>
                 <tr>
                   {myCharacter.behaviorSkills.map((skill) => (
-                    <th key={`myCharacter-${skill.name}`}>{skill.name}</th>
+                    <th key={`myCharacter-${skill.name}`}>
+                      {skill.name}
+                      {skill.annotation && `(${skill.annotation})`}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -427,7 +432,10 @@ const PartyViewer: React.FC = () => {
               <thead>
                 <tr>
                   {myCharacter.negotiationSkills.map((skill) => (
-                    <th key={`myCharacter-${skill.name}`}>{skill.name}</th>
+                    <th key={`myCharacter-${skill.name}`}>
+                      {skill.name}
+                      {skill.annotation && `(${skill.annotation})`}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -447,7 +455,10 @@ const PartyViewer: React.FC = () => {
               <thead>
                 <tr>
                   {myCharacter.knowledgeSkills.map((skill) => (
-                    <th key={`myCharacter-${skill.name}`}>{skill.name}</th>
+                    <th key={`myCharacter-${skill.name}`}>
+                      {skill.name}
+                      {skill.annotation && `(${skill.annotation})`}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -524,14 +535,17 @@ const PartyViewer: React.FC = () => {
               <thead>
                 <tr>
                   {partyCharacter.combatSkills.map((skill) => (
-                    <th key={`myCharacter-${skill.name}`}>{skill.name}</th>
+                    <th key={`partyCharacter-${skill.name}`}>
+                      {skill.name}
+                      {skill.annotation && `(${skill.annotation})`}
+                    </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   {partyCharacter.combatSkills.map((skill) => (
-                    <td key={`myCharacter-${skill.point}`}>
+                    <td key={`partyCharacter-${skill.point}`}>
                       {`${skill.point}%`}
                     </td>
                   ))}
@@ -544,14 +558,17 @@ const PartyViewer: React.FC = () => {
               <thead>
                 <tr>
                   {partyCharacter.exploreSkills.map((skill) => (
-                    <th key={`myCharacter-${skill.name}`}>{skill.name}</th>
+                    <th key={`partyCharacter-${skill.name}`}>
+                      {skill.name}
+                      {skill.annotation && `(${skill.annotation})`}
+                    </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   {partyCharacter.exploreSkills.map((skill) => (
-                    <td key={`myCharacter-${skill.point}`}>
+                    <td key={`partyCharacter-${skill.point}`}>
                       {`${skill.point}%`}
                     </td>
                   ))}
@@ -564,14 +581,17 @@ const PartyViewer: React.FC = () => {
               <thead>
                 <tr>
                   {partyCharacter.behaviorSkills.map((skill) => (
-                    <th key={`myCharacter-${skill.name}`}>{skill.name}</th>
+                    <th key={`partyCharacter-${skill.name}`}>
+                      {skill.name}
+                      {skill.annotation && `(${skill.annotation})`}
+                    </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   {partyCharacter.behaviorSkills.map((skill) => (
-                    <td key={`myCharacter-${skill.point}`}>
+                    <td key={`partyCharacter-${skill.point}`}>
                       {`${skill.point}%`}
                     </td>
                   ))}
@@ -584,14 +604,17 @@ const PartyViewer: React.FC = () => {
               <thead>
                 <tr>
                   {partyCharacter.negotiationSkills.map((skill) => (
-                    <th key={`myCharacter-${skill.name}`}>{skill.name}</th>
+                    <th key={`partyCharacter-${skill.name}`}>
+                      {skill.name}
+                      {skill.annotation && `(${skill.annotation})`}
+                    </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   {partyCharacter.negotiationSkills.map((skill) => (
-                    <td key={`myCharacter-${skill.point}`}>
+                    <td key={`partyCharacter-${skill.point}`}>
                       {`${skill.point}%`}
                     </td>
                   ))}
@@ -604,14 +627,17 @@ const PartyViewer: React.FC = () => {
               <thead>
                 <tr>
                   {partyCharacter.knowledgeSkills.map((skill) => (
-                    <th key={`myCharacter-${skill.name}`}>{skill.name}</th>
+                    <th key={`partyCharacter-${skill.name}`}>
+                      {skill.name}
+                      {skill.annotation && `(${skill.annotation})`}
+                    </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   {partyCharacter.knowledgeSkills.map((skill) => (
-                    <td key={`myCharacter-${skill.point}`}>
+                    <td key={`partyCharacter-${skill.point}`}>
                       {`${skill.point}%`}
                     </td>
                   ))}

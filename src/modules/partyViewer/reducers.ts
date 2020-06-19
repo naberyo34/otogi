@@ -1,6 +1,6 @@
-import { Action } from './actions';
-import types from './actionTypes';
-import { Character } from '../characterMaker/reducers';
+import types from 'modules/partyViewer/actionTypes';
+import Action from 'interfaces/action';
+import Character from 'interfaces/character';
 
 export interface PartyViewerState {
   characters: Character[];

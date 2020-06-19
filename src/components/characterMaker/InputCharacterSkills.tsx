@@ -1,9 +1,9 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { setCharacterSkills } from '../../modules/characterMaker/actions';
-import { State } from '../../modules/index';
-import { Skill } from '../../services/skills/combatSkills';
+import { State } from 'modules';
+import { setCharacterSkills } from 'modules/characterMaker/actions';
+import Skill from 'interfaces/skill';
 
 interface Category {
   name: string;

@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { firestore } from '../../services/firebase';
-import Sound from './Sound';
-import diceRoll, {
-  DiceResult,
-  HiddenDiceResult,
-} from '../../services/diceRoll';
-import formatDate from '../../services/formatDate';
-import generateRandomId from '../../services/generateRandomId';
-import { State } from '../../modules/index';
-import toggleLog from '../../modules/realTimeDice/actions';
+import { firestore } from 'services/firebase';
+import diceRoll, { DiceResult, HiddenDiceResult } from 'services/diceRoll';
+import formatDate from 'services/formatDate';
+import generateRandomId from 'services/generateRandomId';
+import { State } from 'modules/index';
+import toggleLog from 'modules/realTimeDice/actions';
+import Sound from 'components/realTimeDice/Sound';
 
 interface Result {
   id?: string;
