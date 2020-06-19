@@ -1,4 +1,3 @@
-import firebase from 'firebase';
 import types from 'modules/firebase/actionTypes';
 import Action from 'interfaces/action';
 
