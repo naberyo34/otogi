@@ -62,6 +62,7 @@ const ParamsTable = styled.table`
   td {
     padding: 4px;
     line-height: 1.5;
+    text-align: right;
     border: 2px solid gray;
   }
   input {
@@ -361,6 +362,106 @@ const PartyViewer: React.FC = () => {
               </tr>
             </tbody>
           </ParamsTable>
+          {skillTab === 'combat' && (
+            <ParamsTable>
+              <thead>
+                <tr>
+                  {myCharacter.combatSkills.map((skill) => (
+                    <th key={`myCharacter-${skill.name}`}>{skill.name}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  {myCharacter.combatSkills.map((skill) => (
+                    <td key={`myCharacter-${skill.point}`}>
+                      {`${skill.point}%`}
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </ParamsTable>
+          )}
+          {skillTab === 'explore' && (
+            <ParamsTable>
+              <thead>
+                <tr>
+                  {myCharacter.exploreSkills.map((skill) => (
+                    <th key={`myCharacter-${skill.name}`}>{skill.name}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  {myCharacter.exploreSkills.map((skill) => (
+                    <td key={`myCharacter-${skill.point}`}>
+                      {`${skill.point}%`}
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </ParamsTable>
+          )}
+          {skillTab === 'behavior' && (
+            <ParamsTable>
+              <thead>
+                <tr>
+                  {myCharacter.behaviorSkills.map((skill) => (
+                    <th key={`myCharacter-${skill.name}`}>{skill.name}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  {myCharacter.behaviorSkills.map((skill) => (
+                    <td key={`myCharacter-${skill.point}`}>
+                      {`${skill.point}%`}
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </ParamsTable>
+          )}
+          {skillTab === 'negotiation' && (
+            <ParamsTable>
+              <thead>
+                <tr>
+                  {myCharacter.negotiationSkills.map((skill) => (
+                    <th key={`myCharacter-${skill.name}`}>{skill.name}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  {myCharacter.negotiationSkills.map((skill) => (
+                    <td key={`myCharacter-${skill.point}`}>
+                      {`${skill.point}%`}
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </ParamsTable>
+          )}
+          {skillTab === 'knowledge' && (
+            <ParamsTable>
+              <thead>
+                <tr>
+                  {myCharacter.knowledgeSkills.map((skill) => (
+                    <th key={`myCharacter-${skill.name}`}>{skill.name}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  {myCharacter.knowledgeSkills.map((skill) => (
+                    <td key={`myCharacter-${skill.point}`}>
+                      {`${skill.point}%`}
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </ParamsTable>
+          )}
         </StatusCard>
       )}
       {partyCharacters.map((partyCharacter) => (
@@ -418,6 +519,106 @@ const PartyViewer: React.FC = () => {
               </tr>
             </tbody>
           </ParamsTable>
+          {skillTab === 'combat' && (
+            <ParamsTable>
+              <thead>
+                <tr>
+                  {partyCharacter.combatSkills.map((skill) => (
+                    <th key={`myCharacter-${skill.name}`}>{skill.name}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  {partyCharacter.combatSkills.map((skill) => (
+                    <td key={`myCharacter-${skill.point}`}>
+                      {`${skill.point}%`}
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </ParamsTable>
+          )}
+          {skillTab === 'explore' && (
+            <ParamsTable>
+              <thead>
+                <tr>
+                  {partyCharacter.exploreSkills.map((skill) => (
+                    <th key={`myCharacter-${skill.name}`}>{skill.name}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  {partyCharacter.exploreSkills.map((skill) => (
+                    <td key={`myCharacter-${skill.point}`}>
+                      {`${skill.point}%`}
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </ParamsTable>
+          )}
+          {skillTab === 'behavior' && (
+            <ParamsTable>
+              <thead>
+                <tr>
+                  {partyCharacter.behaviorSkills.map((skill) => (
+                    <th key={`myCharacter-${skill.name}`}>{skill.name}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  {partyCharacter.behaviorSkills.map((skill) => (
+                    <td key={`myCharacter-${skill.point}`}>
+                      {`${skill.point}%`}
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </ParamsTable>
+          )}
+          {skillTab === 'negotiation' && (
+            <ParamsTable>
+              <thead>
+                <tr>
+                  {partyCharacter.negotiationSkills.map((skill) => (
+                    <th key={`myCharacter-${skill.name}`}>{skill.name}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  {partyCharacter.negotiationSkills.map((skill) => (
+                    <td key={`myCharacter-${skill.point}`}>
+                      {`${skill.point}%`}
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </ParamsTable>
+          )}
+          {skillTab === 'knowledge' && (
+            <ParamsTable>
+              <thead>
+                <tr>
+                  {partyCharacter.knowledgeSkills.map((skill) => (
+                    <th key={`myCharacter-${skill.name}`}>{skill.name}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  {partyCharacter.knowledgeSkills.map((skill) => (
+                    <td key={`myCharacter-${skill.point}`}>
+                      {`${skill.point}%`}
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </ParamsTable>
+          )}
         </StatusCard>
       ))}
     </Wrapper>

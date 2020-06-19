@@ -1,9 +1,7 @@
 import types from './actionTypes';
-import { Skill } from '../../services/skills/combatSkills';
 
 // TODO: 依存関係が相互になってしまうので一時的にここにも書いてる
 // 型定義を別ファイルで切り出したほうがいいと想います
-
 export interface FoundationParams {
   str: number;
   con: number;

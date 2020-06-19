@@ -118,7 +118,7 @@ const InputCharacterSkills: React.FC = () => {
     skillName: string
   ) => {
     const { value } = e.target;
-    const skillKey = `${category}Skills`
+    const skillKey = `${category}Skills`;
     const currentSkills: Skill[] = newCharacter[skillKey];
     const target = currentSkills.find(
       (currentSkill) => currentSkill.name === skillName
@@ -146,7 +146,7 @@ const InputCharacterSkills: React.FC = () => {
 
     const returnSkills = [...currentSkills];
 
-    dispatch(setCharacterSkills({[skillKey]: returnSkills}));
+    dispatch(setCharacterSkills({ [skillKey]: returnSkills }));
   };
 
   const categories: Category[] = [
