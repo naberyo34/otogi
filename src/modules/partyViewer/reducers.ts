@@ -25,13 +25,6 @@ const partyViewer = (
   action: Action
 ): PartyViewerState => {
   switch (action.type) {
-    // STRなどの値を変更したとき
-    case types.GET_CHARACTERS: {
-      return {
-        ...state,
-        characters: action.payload,
-      };
-    }
     case types.SET_MY_CHARACTER_NAME: {
       return {
         ...state,

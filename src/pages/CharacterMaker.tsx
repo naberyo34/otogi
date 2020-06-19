@@ -1,8 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { firestore } from 'services/firebase';
-import { setCharacterName } from 'modules/characterMaker/actions';
+import { changeCharacterName } from 'modules/characterMaker/actions';
 import { State } from 'modules';
 import InputCharacterParams from 'components/characterMaker/InputCharacterParams';
 import InputCharacterSkills from 'components/characterMaker/InputCharacterSkills';
@@ -33,49 +32,38 @@ const Submit = styled.input`
 
 const CharacterMaker: React.FC = () => {
   const dispatch = useDispatch();
-  const newCharacter = useSelector(
-    (state: State) => state.characterMaker.character
+  const makingCharacter = useSelector(
+    (state: State) => state.characterMaker.makingCharacter
   );
 
   // 名前欄に入力した内容をStoreにも反映
   const handleEditName = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    const newName = {
-      name: value,
-    };
-    dispatch(setCharacterName(newName));
+    dispatch(changeCharacterName(value));
   };
 
   // 計算が必要な能力値をすべて算出し, Firestoreに格納
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!newCharacter.name) {
+    if (!makingCharacter.name) {
       alert('キャラクターの名前が入力されていません');
       return;
     }
 
     const hp = Math.floor(
-      (newCharacter.foundationParams.con + newCharacter.foundationParams.siz) /
+      (makingCharacter.foundationParams.con +
+        makingCharacter.foundationParams.siz) /
         2
     );
-    const mp = newCharacter.foundationParams.pow;
-    const san = newCharacter.foundationParams.pow * 5;
+    const mp = makingCharacter.foundationParams.pow;
+    const san = makingCharacter.foundationParams.pow * 5;
     const submitCharacter = {
-      ...newCharacter,
+      ...makingCharacter,
       hp,
       mp,
       san,
     };
-
-    // キャラクターをfirestoreに追加
-    firestore
-      .collection('character')
-      .doc(submitCharacter.name)
-      .set(submitCharacter)
-      .then(() => {
-        alert('送信に成功しました');
-      });
   };
 
   return (

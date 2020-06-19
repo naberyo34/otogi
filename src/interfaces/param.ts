@@ -10,6 +10,11 @@ export type ParamType =
 
 export default interface Param {
   name: ParamType;
+  point: number;
+}
+
+export interface ParamRange {
+  name: ParamType;
   min: number;
   max: number;
 }

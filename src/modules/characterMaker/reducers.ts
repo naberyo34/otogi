@@ -31,12 +31,14 @@ export const initialCharacter: Character = {
 };
 
 export interface CharacterMakerState {
-  character: Character;
+  makingCharacter: Character;
+  isEditMode: boolean;
 }
 
 // stateの初期化
 const initialState: CharacterMakerState = {
-  character: initialCharacter,
+  makingCharacter: initialCharacter,
+  isEditMode: false,
 };
 
 // Reducerの定義
@@ -46,33 +48,43 @@ const characterMaker = (
 ): CharacterMakerState => {
   switch (action.type) {
     // 名前を入力したとき
-    case types.SET_CHARACTER_NAME: {
+    case types.CHANGE_CHARACTER_NAME: {
       return {
         ...state,
-        character: {
-          ...state.character,
-          ...action.payload,
+        makingCharacter: {
+          ...state.makingCharacter,
+          name: action.payload,
         },
       };
     }
     // STRなどの値を変更したとき
-    case types.SET_CHARACTER_PARAMS: {
+    case types.CHANGE_CHARACTER_PARAMS: {
       return {
         ...state,
-        character: {
-          ...state.character,
-          ...action.payload,
+        makingCharacter: {
+          ...state.makingCharacter,
+          foundationParams: {
+            ...state.makingCharacter.foundationParams,
+            [action.payload.name]: action.payload.point,
+          },
         },
       };
     }
     // 技能欄に入力したとき
-    case types.SET_CHARACTER_SKILLS: {
+    case types.CHANGE_CHARACTER_SKILLS: {
       return {
         ...state,
-        character: {
-          ...state.character,
-          ...action.payload,
+        makingCharacter: {
+          ...state.makingCharacter,
+          [action.payload.skillKey]: action.payload.skills,
         },
+      };
+    }
+    // 新規作成 / 編集の切り替え
+    case types.TOGGLE_EDIT_MODE: {
+      return {
+        ...state,
+        isEditMode: !state.isEditMode,
       };
     }
     default:

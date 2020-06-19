@@ -1,7 +1,7 @@
-import Param from 'interfaces/param';
+import { ParamRange } from 'interfaces/param';
 
 // 能力値の名前と、想定しうる最大/最小値
-const params: Param[] = [
+const params: ParamRange[] = [
   {
     name: 'str',
     min: 3,

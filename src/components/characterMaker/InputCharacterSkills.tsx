@@ -2,11 +2,11 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { State } from 'modules';
-import { setCharacterSkills } from 'modules/characterMaker/actions';
-import Skill from 'interfaces/skill';
+import { changeCharacterSkills } from 'modules/characterMaker/actions';
+import Skill, { SkillType, SkillKey } from 'interfaces/skill';
 
 interface Category {
-  name: string;
+  name: SkillType;
   label: string;
 }
 
@@ -58,14 +58,14 @@ const Table = styled.table`
 
 const InputCharacterSkills: React.FC = () => {
   const dispatch = useDispatch();
-  const newCharacter = useSelector(
-    (state: State) => state.characterMaker.character
+  const makingCharacter = useSelector(
+    (state: State) => state.characterMaker.makingCharacter
   );
 
   // スキルポイントを変更したときにStoreを更新する
   const handleChangeSkillPoint = (
     e: React.ChangeEvent<HTMLInputElement>,
-    category: string,
+    skillType: SkillType,
     skillName: string
   ) => {
     const { value } = e.target;
@@ -77,13 +77,14 @@ const InputCharacterSkills: React.FC = () => {
       return;
     }
 
-    const skillKey = `${category}Skills`;
-    const currentSkills: Skill[] = newCharacter[skillKey];
+    const skillKey = `${skillType}Skills` as SkillKey;
+    const currentSkills: Skill[] = makingCharacter[skillKey];
     const newSkill: Skill = {
       name: skillName,
       point: valueInt,
     };
-    // 対象スキルがアノテーションを含む場合は、newSkillにもアノテーションを入れる
+
+    // 対象スキルを検索
     const target = currentSkills.find(
       (currentSkill) => currentSkill.name === skillName
     );
@@ -95,31 +96,31 @@ const InputCharacterSkills: React.FC = () => {
       return;
     }
 
+    // 対象スキルがアノテーションを含む場合は、newSkillにもアノテーションを入れる
     if (target.annotation || target.annotation === '') {
       newSkill.annotation = target?.annotation;
     }
 
-    // 対象のスキルが配列のどこにあるか検索し、そこだけ置き換える
+    // 対象スキルが配列のどこにあるか検索し、そこだけ新しい情報に置換する
     const targetIndex = currentSkills.findIndex(
       (currentSkill) => currentSkill.name === skillName
     );
-
     currentSkills.splice(targetIndex, 1, newSkill);
 
+    // 念のため新たな配列を作り直し、Storeに反映
     const returnSkills = [...currentSkills];
-
-    dispatch(setCharacterSkills({ [skillKey]: returnSkills }));
+    dispatch(changeCharacterSkills({ skillKey, skills: returnSkills }));
   };
 
   // アノテーション(ex: 芸術(BL)のような注釈)を変更したときにStoreを更新する
   const handleChangeAnnotation = (
     e: React.ChangeEvent<HTMLInputElement>,
-    category: string,
+    skillType: SkillType,
     skillName: string
   ) => {
     const { value } = e.target;
-    const skillKey = `${category}Skills`;
-    const currentSkills: Skill[] = newCharacter[skillKey];
+    const skillKey = `${skillType}Skills` as SkillKey;
+    const currentSkills: Skill[] = makingCharacter[skillKey];
     const target = currentSkills.find(
       (currentSkill) => currentSkill.name === skillName
     );
@@ -137,16 +138,13 @@ const InputCharacterSkills: React.FC = () => {
       annotation: value,
     };
 
-    // 対象のスキルが配列のどこにあるか検索し、そこだけ置き換える
     const targetIndex = currentSkills.findIndex(
       (currentSkill) => currentSkill.name === skillName
     );
-
     currentSkills.splice(targetIndex, 1, newSkill);
 
     const returnSkills = [...currentSkills];
-
-    dispatch(setCharacterSkills({ [skillKey]: returnSkills }));
+    dispatch(changeCharacterSkills({ skillKey, skills: returnSkills }));
   };
 
   const categories: Category[] = [
@@ -193,7 +191,7 @@ const InputCharacterSkills: React.FC = () => {
     const thKey = `${category.name}Th`;
     const tdKey = `${category.name}Td`;
 
-    newCharacter[key].forEach((skill: Skill) => {
+    makingCharacter[key].forEach((skill: Skill) => {
       const th = <th>{skill.name}</th>;
       const td = (
         <td>

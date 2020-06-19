@@ -22,23 +22,13 @@ const RealTimeDice = (
 ): RealTimeDiceState => {
   switch (action.type) {
     case types.TOGGLE_LOG: {
-      if (state.log.isShow) {
-        return {
-          ...state,
-          log: {
-            isShow: false,
-          },
-        };
-      }
-
       return {
         ...state,
         log: {
-          isShow: true,
+          isShow: !state.log.isShow,
         },
       };
     }
-
     default:
       return state;
   }

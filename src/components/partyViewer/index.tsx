@@ -1,10 +1,8 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { firestore } from 'services/firebase';
 import { State } from 'modules';
 import {
-  getCharacters,
   setMyCharacterName,
   selectPartyCharacterName,
   setPartyCharacterNames,
@@ -159,50 +157,50 @@ const PartyViewer: React.FC = () => {
     };
 
     // Firestoreを更新
-    firestore.collection('character').doc(myCharacterName).update(updateParam);
+    // firestore.collection('character').doc(myCharacterName).update(updateParam);
   };
 
-  useEffect(() => {
-    const characterQueryCollection = firestore
-      .collection('character')
-      .orderBy('name', 'asc');
+  // useEffect(() => {
+  //   const characterQueryCollection = firestore
+  //     .collection('character')
+  //     .orderBy('name', 'asc');
 
-    // Firestoreが変更を検知したときに発火し、以下の処理を行う
-    characterQueryCollection.onSnapshot((querySnapshot) => {
-      const currentCharacters = characters;
+  //   // Firestoreが変更を検知したときに発火し、以下の処理を行う
+  //   characterQueryCollection.onSnapshot((querySnapshot) => {
+  //     const currentCharacters = characters;
 
-      querySnapshot.docChanges().forEach((change) => {
-        // ここでFirestoreから受け取る値はCharacter型のはずなので、キャストしている
-        const rawData = change.doc.data() as Character;
-        const targetIndex = currentCharacters.findIndex(
-          (character) => character.name === rawData.name
-        );
-        switch (change.type) {
-          // キャラクターデータが追加されたとき (※アプリ起動時にも発火する)
-          case 'added':
-            // すでに読み込みが完了している場合は無視する (画面遷移などでuseEffectが再度発火したとき用)
-            if (characters.some((character) => character.name === rawData.name))
-              return;
+  //     querySnapshot.docChanges().forEach((change) => {
+  //       // ここでFirestoreから受け取る値はCharacter型のはずなので、キャストしている
+  //       const rawData = change.doc.data() as Character;
+  //       const targetIndex = currentCharacters.findIndex(
+  //         (character) => character.name === rawData.name
+  //       );
+  //       switch (change.type) {
+  //         // キャラクターデータが追加されたとき (※アプリ起動時にも発火する)
+  //         case 'added':
+  //           // すでに読み込みが完了している場合は無視する (画面遷移などでuseEffectが再度発火したとき用)
+  //           if (characters.some((character) => character.name === rawData.name))
+  //             return;
 
-            currentCharacters.push(rawData);
-            break;
-          // キャラクターデータが変更されたとき
-          case 'modified':
-            currentCharacters.splice(targetIndex, 1, rawData);
-            break;
-          default:
-            break;
-        }
-      });
+  //           currentCharacters.push(rawData);
+  //           break;
+  //         // キャラクターデータが変更されたとき
+  //         case 'modified':
+  //           currentCharacters.splice(targetIndex, 1, rawData);
+  //           break;
+  //         default:
+  //           break;
+  //       }
+  //     });
 
-      // 新しい配列を作成し、dispatchする
-      // MEMO: 配列は新たに作成しないとReactが変更として検知しないことがある
-      const returnCharacters = [...currentCharacters];
-      dispatch(getCharacters(returnCharacters));
-    });
-    // MEMO: 初回にonSnapshotが読み込まれた時点であとはリッスンしてくれるので、useEffectは初回しか起動しない
-    // eslint-disable-next-line
-  }, []);
+  //     // 新しい配列を作成し、dispatchする
+  //     // MEMO: 配列は新たに作成しないとReactが変更として検知しないことがある
+  //     const returnCharacters = [...currentCharacters];
+  //     dispatch(getCharacters(returnCharacters));
+  //   });
+  //   // MEMO: 初回にonSnapshotが読み込まれた時点であとはリッスンしてくれるので、useEffectは初回しか起動しない
+  //   // eslint-disable-next-line
+  // }, []);
 
   return (
     <Wrapper>

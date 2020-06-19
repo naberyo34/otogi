@@ -1,18 +1,28 @@
 import types from 'modules/characterMaker/actionTypes';
 import Action from 'interfaces/action';
+import Param from 'interfaces/param';
+import Skill, { SkillKey } from 'interfaces/skill';
 
-// TODO: ペイロードの形が……
-export const setCharacterName = (payload: any): Action => ({
-  type: types.SET_CHARACTER_NAME,
+interface SkillsPayload {
+  skillKey: SkillKey;
+  skills: Skill[];
+}
+
+export const changeCharacterName = (payload: string): Action => ({
+  type: types.CHANGE_CHARACTER_NAME,
   payload,
 });
 
-export const setCharacterParams = (payload: any): Action => ({
-  type: types.SET_CHARACTER_PARAMS,
+export const changeCharacterParams = (payload: Param): Action => ({
+  type: types.CHANGE_CHARACTER_PARAMS,
   payload,
 });
 
-export const setCharacterSkills = (payload: any): Action => ({
-  type: types.SET_CHARACTER_SKILLS,
+export const changeCharacterSkills = (payload: SkillsPayload): Action => ({
+  type: types.CHANGE_CHARACTER_SKILLS,
   payload,
+});
+
+export const toggleEditMode = (): Action => ({
+  type: types.TOGGLE_EDIT_MODE,
 });

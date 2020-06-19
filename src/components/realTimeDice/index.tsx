@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { firestore } from 'services/firebase';
 import diceRoll, { DiceResult, HiddenDiceResult } from 'services/diceRoll';
 import formatDate from 'services/formatDate';
 import generateRandomId from 'services/generateRandomId';
@@ -330,11 +329,11 @@ const RealTimeDice: React.FC = () => {
     switch (rollType) {
       // グローバルダイスロール(全体公開, 普通のロール)
       case 'global':
-        firestore.collection('result').add(newResult);
+        // firestore.collection('result').add(newResult);
         break;
       // 出目を伏せてダイスロール(振ったことは通知)
       case 'hiding':
-        firestore.collection('result').add(hiddenResult);
+        // firestore.collection('result').add(hiddenResult);
         // localResultにのみ結果を表示
         // TODO: いくらなんでもこのsetTimeoutはお粗末すぎる
         setTimeout(() => setLocalResult(newResult), 500);
@@ -358,35 +357,35 @@ const RealTimeDice: React.FC = () => {
     dispatch(toggleLog());
   };
 
-  useEffect(() => {
-    const currentLog: any[] = [];
-    // Firestoreの変更を検知し、DOMの状態を変更 (リアルタイムダイス)
-    const resultQueryCollection = firestore
-      .collection('result')
-      .orderBy('timestamp', 'asc');
+  // useEffect(() => {
+  //   const currentLog: any[] = [];
+  //   // Firestoreの変更を検知し、DOMの状態を変更 (リアルタイムダイス)
+  //   const resultQueryCollection = firestore
+  //     .collection('result')
+  //     .orderBy('timestamp', 'asc');
 
-    resultQueryCollection.onSnapshot((querySnapshot) => {
-      querySnapshot.docChanges().forEach((change) => {
-        // Firestoreにデータが追加されたとき (※アプリ起動時にも発火する)
-        if (change.type === 'added') {
-          const rawData: firebase.firestore.DocumentData = change.doc.data();
+  //   resultQueryCollection.onSnapshot((querySnapshot) => {
+  //     querySnapshot.docChanges().forEach((change) => {
+  //       // Firestoreにデータが追加されたとき (※アプリ起動時にも発火する)
+  //       if (change.type === 'added') {
+  //         const rawData: firebase.firestore.DocumentData = change.doc.data();
 
-          // ダイス演出を行う
-          if (rawData.dice.type === '何か') {
-            dicePerformance('hiding');
-          } else {
-            dicePerformance('global');
-          }
+  //         // ダイス演出を行う
+  //         if (rawData.dice.type === '何か') {
+  //           dicePerformance('hiding');
+  //         } else {
+  //           dicePerformance('global');
+  //         }
 
-          // currentResultを最新の結果に更新
-          setCurrentResult(rawData);
-          // ログに最新の結果をunshiftしてstateを更新
-          currentLog.unshift(rawData);
-        }
-      });
-      setResultLog(currentLog);
-    });
-  }, []);
+  //         // currentResultを最新の結果に更新
+  //         setCurrentResult(rawData);
+  //         // ログに最新の結果をunshiftしてstateを更新
+  //         currentLog.unshift(rawData);
+  //       }
+  //     });
+  //     setResultLog(currentLog);
+  //   });
+  // }, []);
 
   return (
     <Wrapper>

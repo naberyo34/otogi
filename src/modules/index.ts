@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+import firebaseReducer, { FirebaseState } from 'modules/firebase/reducers';
 import realTimeDice, { RealTimeDiceState } from 'modules/realTimeDice/reducers';
 import partyViewer, { PartyViewerState } from 'modules/partyViewer/reducers';
 import characterMaker, {
@@ -7,6 +8,7 @@ import characterMaker, {
 
 // 全Stateを結合
 export interface State {
+  firebaseReducer: FirebaseState;
   realTimeDice: RealTimeDiceState;
   partyViewer: PartyViewerState;
   characterMaker: CharacterMakerState;
@@ -14,6 +16,7 @@ export interface State {
 
 // 全Reducerを結合
 export default combineReducers({
+  firebaseReducer,
   realTimeDice,
   partyViewer,
   characterMaker,

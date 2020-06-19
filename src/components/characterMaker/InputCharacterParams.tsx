@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { State } from 'modules';
-import { setCharacterParams } from 'modules/characterMaker/actions';
+import { changeCharacterParams } from 'modules/characterMaker/actions';
 import { ParamType } from 'interfaces/param';
 import params from 'services/params';
 
@@ -40,9 +40,14 @@ const Table = styled.table`
 const InputCharacterParams: React.FC = () => {
   const dispatch = useDispatch();
   const FoundationParams = useSelector(
-    (state: State) => state.characterMaker.character.foundationParams
+    (state: State) => state.characterMaker.makingCharacter.foundationParams
   );
-  // 値を変更したときにStoreを更新する
+
+  /**
+   * フォームの変更をStoreに反映する
+   * @param e イベント
+   * @param paramType パラメータの種類 (ex: 'str'など)
+   */
   const handleChooseParams = (
     e: React.ChangeEvent<HTMLSelectElement>,
     paramType: ParamType
@@ -51,8 +56,7 @@ const InputCharacterParams: React.FC = () => {
     const valueInt = parseInt(value, 10);
 
     FoundationParams[paramType] = valueInt;
-
-    dispatch(setCharacterParams({ foundationParams: FoundationParams }));
+    dispatch(changeCharacterParams({ name: paramType, point: valueInt }));
   };
 
   /**
@@ -72,7 +76,7 @@ const InputCharacterParams: React.FC = () => {
 
     while (i <= max) {
       options.push(
-        <option key={`${i}`} value={`${i}`}>
+        <option key={`${paramType}-${i}`} value={`${i}`}>
           {i}
         </option>
       );
@@ -89,22 +93,20 @@ const InputCharacterParams: React.FC = () => {
     );
   };
 
-  const tableHead: JSX.Element[] = [];
-  const tableData: JSX.Element[] = [];
+  const thArray: JSX.Element[] = [];
+  const tdArray: JSX.Element[] = [];
 
   // 配列paramsの情報を元に、JSXElementの配列を作成
   params.forEach((param) => {
-    const thElement = (
-      <th key={`th-${param.name}`}>{param.name.toUpperCase()}</th>
-    );
-    const tdElement = (
+    const th = <th key={`th-${param.name}`}>{param.name.toUpperCase()}</th>;
+    const td = (
       <td key={`td-${param.name}`}>
         {generateSelectBox(param.name, param.min, param.max)}
       </td>
     );
 
-    tableHead.push(thElement);
-    tableData.push(tdElement);
+    thArray.push(th);
+    tdArray.push(td);
   });
 
   return (
@@ -112,10 +114,10 @@ const InputCharacterParams: React.FC = () => {
       <Title>能力値</Title>
       <Table>
         <thead>
-          <tr>{tableHead}</tr>
+          <tr>{thArray}</tr>
         </thead>
         <tbody>
-          <tr>{tableData}</tr>
+          <tr>{tdArray}</tr>
         </tbody>
       </Table>
     </Wrapper>

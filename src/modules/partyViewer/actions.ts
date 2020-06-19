@@ -1,11 +1,5 @@
 import types from 'modules/partyViewer/actionTypes';
 import Action from 'interfaces/action';
-import Character from 'interfaces/character';
-
-export const getCharacters = (payload: Character[]): Action => ({
-  type: types.GET_CHARACTERS,
-  payload,
-});
 
 export const setMyCharacterName = (payload: string): Action => ({
   type: types.SET_MY_CHARACTER_NAME,
