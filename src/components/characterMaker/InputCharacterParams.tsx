@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { State } from 'modules';
 import { changeCharacterParams } from 'modules/characterMaker/actions';
 import { ParamType } from 'interfaces/param';
-import params from 'services/params';
+import { paramsRange } from 'services/params';
 
 const Wrapper = styled.section`
   margin-top: 32px;
@@ -96,12 +96,14 @@ const InputCharacterParams: React.FC = () => {
   const thArray: JSX.Element[] = [];
   const tdArray: JSX.Element[] = [];
 
-  // 配列paramsの情報を元に、JSXElementの配列を作成
-  params.forEach((param) => {
-    const th = <th key={`th-${param.name}`}>{param.name.toUpperCase()}</th>;
+  // 配列paramsRangeの情報を元に、JSXElementの配列を作成
+  paramsRange.forEach((paramRange) => {
+    const th = (
+      <th key={`th-${paramRange.name}`}>{paramRange.name.toUpperCase()}</th>
+    );
     const td = (
-      <td key={`td-${param.name}`}>
-        {generateSelectBox(param.name, param.min, param.max)}
+      <td key={`td-${paramRange.name}`}>
+        {generateSelectBox(paramRange.name, paramRange.min, paramRange.max)}
       </td>
     );
 

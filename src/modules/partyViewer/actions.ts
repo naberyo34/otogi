@@ -1,22 +1,22 @@
 import types from 'modules/partyViewer/actionTypes';
 import Action from 'interfaces/action';
 
-export const setMyCharacterName = (payload: string): Action => ({
-  type: types.SET_MY_CHARACTER_NAME,
+export const setMyCharacter = (payload: string): Action => ({
+  type: types.SET_MY_CHARACTER,
   payload,
 });
 
-export const selectPartyCharacterName = (payload: string): Action => ({
-  type: types.SELECT_PARTY_CHARACTER_NAME,
+export const setPartyCharacters = (payload: string[]): Action => ({
+  type: types.SET_PARTY_CHARACTERS,
   payload,
 });
 
-export const setPartyCharacterNames = (payload: string[]): Action => ({
-  type: types.SET_PARTY_CHARACTER_NAMES,
+export const changePartyCharacter = (payload: string): Action => ({
+  type: types.CHANGE_PARTY_CHARACTER,
   payload,
 });
 
-export const selectSkillTab = (payload: string): Action => ({
-  type: types.SELECT_SKILL_TAB,
+export const changeSkillView = (payload: string): Action => ({
+  type: types.CHANGE_SKILL_VIEW,
   payload,
 });

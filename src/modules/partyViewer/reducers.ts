@@ -1,22 +1,20 @@
 import types from 'modules/partyViewer/actionTypes';
 import Action from 'interfaces/action';
-import Character from 'interfaces/character';
+import { SkillType } from 'interfaces/skill';
 
 export interface PartyViewerState {
-  characters: Character[];
-  myCharacterName: string;
-  selectedCharacterName: string;
-  partyCharacterNames: string[];
-  skillTab: string;
+  myCharacter: string;
+  partyCharacters: string[];
+  selectedCharacter: string;
+  selectedSkillView: SkillType;
 }
 
 // stateの初期化
 const initialState: PartyViewerState = {
-  characters: [],
-  myCharacterName: '',
-  selectedCharacterName: '',
-  partyCharacterNames: [],
-  skillTab: 'combat',
+  myCharacter: '',
+  partyCharacters: [],
+  selectedCharacter: '',
+  selectedSkillView: 'combat',
 };
 
 // Reducerの定義
@@ -25,28 +23,28 @@ const partyViewer = (
   action: Action
 ): PartyViewerState => {
   switch (action.type) {
-    case types.SET_MY_CHARACTER_NAME: {
+    case types.SET_MY_CHARACTER: {
       return {
         ...state,
-        myCharacterName: action.payload,
+        myCharacter: action.payload,
       };
     }
-    case types.SELECT_PARTY_CHARACTER_NAME: {
+    case types.SET_PARTY_CHARACTERS: {
       return {
         ...state,
-        selectedCharacterName: action.payload,
+        partyCharacters: action.payload,
       };
     }
-    case types.SET_PARTY_CHARACTER_NAMES: {
+    case types.CHANGE_PARTY_CHARACTER: {
       return {
         ...state,
-        partyCharacterNames: action.payload,
+        selectedCharacter: action.payload,
       };
     }
-    case types.SELECT_SKILL_TAB: {
+    case types.CHANGE_SKILL_VIEW: {
       return {
         ...state,
-        skillTab: action.payload,
+        selectedSkillView: action.payload,
       };
     }
     default:

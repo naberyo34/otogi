@@ -2,6 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { changeCharacterName } from 'modules/characterMaker/actions';
+import { addCharacter } from 'modules/firebase/actions';
 import { State } from 'modules';
 import InputCharacterParams from 'components/characterMaker/InputCharacterParams';
 import InputCharacterSkills from 'components/characterMaker/InputCharacterSkills';
@@ -64,6 +65,9 @@ const CharacterMaker: React.FC = () => {
       mp,
       san,
     };
+
+    // actionを発行し、SagaでFirestoreに追加
+    dispatch(addCharacter.start(submitCharacter));
   };
 
   return (

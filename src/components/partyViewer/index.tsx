@@ -1,14 +1,19 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { State } from 'modules';
 import {
-  setMyCharacterName,
-  selectPartyCharacterName,
-  setPartyCharacterNames,
-  selectSkillTab,
+  setMyCharacter,
+  setPartyCharacters,
+  changePartyCharacter,
+  changeSkillView,
 } from 'modules/partyViewer/actions';
+import { updateCharacter } from 'modules/firebase/actions';
 import Character from 'interfaces/character';
+import { AllParams } from 'interfaces/param';
+import Skill from 'interfaces/skill';
+import { allParamCategories } from 'services/params';
+import skillCategories from 'services/skills/skillCategories';
 
 const Wrapper = styled.section`
   width: calc(100vw - 320px);
@@ -30,18 +35,18 @@ const PartyForm = styled.form`
   }
 `;
 
-const SkillTab = styled.div`
+const SkillSelect = styled.div`
   margin-top: 16px;
 `;
 
-const StatusCard = styled.div`
+const Status = styled.div`
   padding: 16px;
   margin-top: 16px;
   background: aliceblue;
   border-radius: 4px;
 `;
 
-const CardName = styled.h3`
+const StatusName = styled.h3`
   font-size: 1.6rem;
 `;
 
@@ -71,64 +76,70 @@ const ParamsTable = styled.table`
 const PartyViewer: React.FC = () => {
   const dispatch = useDispatch();
   const characters = useSelector(
-    (state: State) => state.partyViewer.characters
+    (state: State) => state.firebaseReducer.characters
   );
-  const myCharacterName = useSelector(
-    (state: State) => state.partyViewer.myCharacterName
+  const myCharacter = useSelector(
+    (state: State) => state.partyViewer.myCharacter
   );
-  const selectedCharacterName = useSelector(
-    (state: State) => state.partyViewer.selectedCharacterName
+  const selectedCharacter = useSelector(
+    (state: State) => state.partyViewer.selectedCharacter
   );
-  const partyCharacterNames = useSelector(
-    (state: State) => state.partyViewer.partyCharacterNames
+  const partyCharacters = useSelector(
+    (state: State) => state.partyViewer.partyCharacters
   );
-  const skillTab = useSelector((state: State) => state.partyViewer.skillTab);
+  const selectedSkillView = useSelector(
+    (state: State) => state.partyViewer.selectedSkillView
+  );
+
   /**
    * partyCharacters(String[])から実データ(Character[])を生成
    * @returns パーティメンバーの情報が格納された配列
    */
   const findPartyCharactersData = (): Character[] => {
-    const dataArray: Character[] = [];
+    const targetArray: Character[] = [];
 
-    partyCharacterNames.forEach((partyCharacterName) => {
-      const data = characters.find(
-        (character) => character.name === partyCharacterName
+    partyCharacters.forEach((partyCharacter) => {
+      const target = characters.find(
+        (character) => character.name === partyCharacter
       );
 
-      if (data) dataArray.push(data);
+      if (target) targetArray.push(target);
     });
 
-    return dataArray;
+    return targetArray;
   };
 
   // stateから検索したキャラクターの実データ これをレンダリングに使う
-  const myCharacter = characters.find(
-    (character) => character.name === myCharacterName
+  const myCharacterData = characters.find(
+    (character) => character.name === myCharacter
   );
-  const partyCharacters: Character[] = findPartyCharactersData();
+  // 同上
+  const partyCharactersData: Character[] = findPartyCharactersData();
+
   // 選択したキャラクターをマイキャラクターとして設定
-  const handleSelectMyCharacter = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleSetMyCharacter = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
-    dispatch(setMyCharacterName(value));
+    dispatch(setMyCharacter(value));
   };
   // パーティ追加対象のキャラクターを選択
-  const handleSelectPartyCharacter = (
+  const handleChangePartyCharacter = (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const { value } = e.target;
-    dispatch(selectPartyCharacterName(value));
+    dispatch(changePartyCharacter(value));
   };
   // 選択したキャラクターをパーティに追加
-  const handleAddPartyCharacters = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSetPartyCharacters = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const addedParty = [...partyCharacterNames, selectedCharacterName];
-    dispatch(setPartyCharacterNames(addedParty));
+    const addedParty = [...partyCharacters, selectedCharacter];
+    dispatch(setPartyCharacters(addedParty));
   };
   // 技能表示のタブ切り替え
-  const handleChangeSkillTab = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeSkillView = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    dispatch(selectSkillTab(value));
+    dispatch(changeSkillView(value));
   };
+
   /**
    * 可変パラメータの値変更をFirestoreに反映する
    * @param e イベント
@@ -152,60 +163,204 @@ const PartyViewer: React.FC = () => {
     }
 
     const valueInt = parseInt(value, 10);
-    const updateParam = {
-      [paramType]: valueInt,
-    };
 
-    // Firestoreを更新
-    // firestore.collection('character').doc(myCharacterName).update(updateParam);
+    // Saga経由でFirestoreを更新
+    dispatch(
+      updateCharacter.start({
+        target: myCharacter,
+        key: paramType,
+        value: valueInt,
+      })
+    );
   };
 
-  // useEffect(() => {
-  //   const characterQueryCollection = firestore
-  //     .collection('character')
-  //     .orderBy('name', 'asc');
+  /**
+   * キャラクター情報を受け取ってパラメータのJSXElmentを作成
+   * @param character キャラクター情報
+   * @param isMyCharacter これが自分のキャラクターならtrueを渡す
+   */
+  const generateParamsTable = (
+    character: Character,
+    isMyCharacter?: boolean
+  ) => {
+    const characterAllParams: AllParams = {
+      hp: character.hp,
+      maxhp: Math.floor(
+        (character.foundationParams.con + character.foundationParams.siz) / 2
+      ),
+      mp: character.mp,
+      maxmp: character.foundationParams.pow,
+      san: character.san,
+      maxsan: character.foundationParams.pow * 5,
+      madness: character.foundationParams.pow * 4,
+      str: character.foundationParams.str,
+      con: character.foundationParams.con,
+      pow: character.foundationParams.pow,
+      dex: character.foundationParams.dex,
+      app: character.foundationParams.app,
+      siz: character.foundationParams.siz,
+      int: character.foundationParams.int,
+      edu: character.foundationParams.edu,
+      luck: character.foundationParams.pow * 5,
+      idea: character.foundationParams.int * 5,
+      know: character.foundationParams.edu * 5,
+    };
+    const paramsTable = (
+      <ParamsTable>
+        <thead>
+          <tr>
+            {allParamCategories.map((paramCategory) => (
+              <th key={`${character.name}-${paramCategory.type}`}>
+                {paramCategory.label}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            {allParamCategories.map((paramCategory) => {
+              switch (paramCategory.type) {
+                case 'hp':
+                case 'mp':
+                case 'san': {
+                  const paramType = paramCategory.type as 'hp' | 'mp' | 'san';
+                  const targetKey = {
+                    current: paramCategory.type,
+                    max: `max${paramCategory.type}`,
+                  };
+                  const current = characterAllParams[targetKey.current];
+                  const max = characterAllParams[targetKey.max];
+                  const isSan = paramType === 'san';
 
-  //   // Firestoreが変更を検知したときに発火し、以下の処理を行う
-  //   characterQueryCollection.onSnapshot((querySnapshot) => {
-  //     const currentCharacters = characters;
+                  return (
+                    <td key={`${character.name}-${paramType}-point`}>
+                      {isMyCharacter ? (
+                        <input
+                          type="number"
+                          min={0}
+                          max={isSan ? 99 : max}
+                          value={current}
+                          onChange={(e) =>
+                            handleChangeCurrentParam(e, paramType)
+                          }
+                        />
+                      ) : (
+                        <>{current}</>
+                      )}{' '}
+                      / {max}
+                      {isSan && (
+                        <>
+                          <br />
+                          不定: {characterAllParams.madness}
+                        </>
+                      )}
+                    </td>
+                  );
+                }
+                default: {
+                  return (
+                    <td key={`${character.name}-${paramCategory.type}-point`}>
+                      {characterAllParams[paramCategory.type]}
+                    </td>
+                  );
+                }
+              }
+            })}
+          </tr>
+        </tbody>
+      </ParamsTable>
+    );
 
-  //     querySnapshot.docChanges().forEach((change) => {
-  //       // ここでFirestoreから受け取る値はCharacter型のはずなので、キャストしている
-  //       const rawData = change.doc.data() as Character;
-  //       const targetIndex = currentCharacters.findIndex(
-  //         (character) => character.name === rawData.name
-  //       );
-  //       switch (change.type) {
-  //         // キャラクターデータが追加されたとき (※アプリ起動時にも発火する)
-  //         case 'added':
-  //           // すでに読み込みが完了している場合は無視する (画面遷移などでuseEffectが再度発火したとき用)
-  //           if (characters.some((character) => character.name === rawData.name))
-  //             return;
+    return paramsTable;
+  };
 
-  //           currentCharacters.push(rawData);
-  //           break;
-  //         // キャラクターデータが変更されたとき
-  //         case 'modified':
-  //           currentCharacters.splice(targetIndex, 1, rawData);
-  //           break;
-  //         default:
-  //           break;
-  //       }
-  //     });
+  /**
+   * キャラクター情報を受け取ってスキルのJSXElement (配列) を作成
+   * @param character キャラクター情報
+   */
+  const generateSkillsTables = (character: Character) => {
+    const skillsTables: JSX.Element[] = [];
 
-  //     // 新しい配列を作成し、dispatchする
-  //     // MEMO: 配列は新たに作成しないとReactが変更として検知しないことがある
-  //     const returnCharacters = [...currentCharacters];
-  //     dispatch(getCharacters(returnCharacters));
-  //   });
-  //   // MEMO: 初回にonSnapshotが読み込まれた時点であとはリッスンしてくれるので、useEffectは初回しか起動しない
-  //   // eslint-disable-next-line
-  // }, []);
+    skillCategories.forEach((skillCategory) => {
+      const targetKey = `${skillCategory.type}Skills`;
+      const targetSkills = character[targetKey] as Skill[];
+
+      const skillsTable = (
+        <ParamsTable>
+          <thead>
+            <tr>
+              {targetSkills.map((targetSkill) => (
+                <th key={`${character.name}-${targetSkill.name}`}>
+                  {targetSkill.name}
+                  {targetSkill.annotation && `(${targetSkill.annotation})`}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              {targetSkills.map((targetSkill) => (
+                <td key={`${character.name}-${targetSkill.name}-point`}>
+                  {`${targetSkill.point} %`}
+                </td>
+              ))}
+            </tr>
+          </tbody>
+        </ParamsTable>
+      );
+
+      skillsTables.push(skillsTable);
+    });
+
+    return skillsTables;
+  };
+
+  /**
+   * generateParamsTableとgenerateSkillsTablesを組み合わせてレンダリング用のJSXを作成
+   * @param character キャラクター
+   * @param isMyCharacter これが自分のキャラクターならtrueを渡す
+   */
+  const generateStatus = (character: Character, isMyCharacter?: boolean) => {
+    const paramsTable = generateParamsTable(character, isMyCharacter);
+    const skillsTables = generateSkillsTables(character);
+    return (
+      <Status key={`${character.name}-status`}>
+        {isMyCharacter && <p>マイキャラクター</p>}
+        <StatusName>{character.name}</StatusName>
+        {paramsTable}
+        {selectedSkillView === 'combat' && skillsTables[0]}
+        {selectedSkillView === 'explore' && skillsTables[1]}
+        {selectedSkillView === 'behavior' && skillsTables[2]}
+        {selectedSkillView === 'negotiation' && skillsTables[3]}
+        {selectedSkillView === 'knowledge' && skillsTables[4]}
+      </Status>
+    );
+  };
+
+  // スキル表示を切り替えるラジオボタンを作成
+  const skillSelectRadioButtons: JSX.Element[] = [];
+
+  skillCategories.forEach((skillCategory) => {
+    const radio = (
+      <React.Fragment key={`${skillCategory.type}-radio`}>
+        <input
+          type="radio"
+          name="skill"
+          value={skillCategory.type}
+          checked={selectedSkillView === skillCategory.type}
+          onChange={(e) => handleChangeSkillView(e)}
+        />
+        <span>{skillCategory.label}</span>
+      </React.Fragment>
+    );
+
+    skillSelectRadioButtons.push(radio);
+  });
 
   return (
     <Wrapper>
       <p>あなたの名前は:</p>
-      <select onChange={(e) => handleSelectMyCharacter(e)}>
+      <select onChange={(e) => handleSetMyCharacter(e)}>
         <option value="">選択してください</option>
         {characters.map((character) => (
           <option key={`$myCharacter-${character.name}`} value={character.name}>
@@ -213,12 +368,12 @@ const PartyViewer: React.FC = () => {
           </option>
         ))}
       </select>
-      <PartyForm onSubmit={(e) => handleAddPartyCharacters(e)}>
+      <PartyForm onSubmit={(e) => handleSetPartyCharacters(e)}>
         <p>
           パーティに追加
-          (自分以外のキャラクターの情報が閲覧できます。リストはローカルでのみ表示されるので、他人とは同期しません):
+          (自分以外のキャラクターの情報が閲覧できます。自分だけが見えています):
         </p>
-        <select onChange={(e) => handleSelectPartyCharacter(e)}>
+        <select onChange={(e) => handleChangePartyCharacter(e)}>
           <option value="">選択してください</option>
           {characters.map((character) => (
             <option
@@ -231,420 +386,11 @@ const PartyViewer: React.FC = () => {
         </select>
         <button type="submit">追加</button>
       </PartyForm>
-      {/* TODO: 省略して書け */}
-      <SkillTab>
-        <p>技能表示</p>
-        <input
-          type="radio"
-          name="skill"
-          value="combat"
-          checked={skillTab === 'combat'}
-          onChange={(e) => handleChangeSkillTab(e)}
-        />
-        <span>戦闘系</span>
-        <input
-          type="radio"
-          name="skill"
-          value="explore"
-          checked={skillTab === 'explore'}
-          onChange={(e) => handleChangeSkillTab(e)}
-        />
-        <span>探索系</span>
-        <input
-          type="radio"
-          name="skill"
-          value="behavior"
-          checked={skillTab === 'behavior'}
-          onChange={(e) => handleChangeSkillTab(e)}
-        />
-        <span>行動系</span>
-        <input
-          type="radio"
-          name="skill"
-          value="negotiation"
-          checked={skillTab === 'negotiation'}
-          onChange={(e) => handleChangeSkillTab(e)}
-        />
-        <span>交渉系</span>
-        <input
-          type="radio"
-          name="skill"
-          value="knowledge"
-          checked={skillTab === 'knowledge'}
-          onChange={(e) => handleChangeSkillTab(e)}
-        />
-        <span>知識系</span>
-      </SkillTab>
-      {myCharacter && (
-        <StatusCard>
-          <p>マイキャラクター</p>
-          <CardName>{myCharacter.name}</CardName>
-          {/* TODO: もうちょっとどうにかしろ */}
-          <ParamsTable>
-            <thead>
-              <tr>
-                <th>HP</th>
-                <th>MP</th>
-                <th>SAN</th>
-                <th>STR</th>
-                <th>CON</th>
-                <th>POW</th>
-                <th>DEX</th>
-                <th>APP</th>
-                <th>SIZ</th>
-                <th>INT</th>
-                <th>EDU</th>
-                <th>幸運</th>
-                <th>アイデア</th>
-                <th>知識</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <input
-                    type="number"
-                    min={0}
-                    max={Math.floor(
-                      (myCharacter.foundationParams.con +
-                        myCharacter.foundationParams.siz) /
-                        2
-                    )}
-                    value={myCharacter.hp}
-                    onChange={(e) => handleChangeCurrentParam(e, 'hp')}
-                  />{' '}
-                  /{' '}
-                  {Math.floor(
-                    (myCharacter.foundationParams.con +
-                      myCharacter.foundationParams.siz) /
-                      2
-                  )}
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    min={0}
-                    max={myCharacter.foundationParams.pow}
-                    value={myCharacter.mp}
-                    onChange={(e) => handleChangeCurrentParam(e, 'mp')}
-                  />{' '}
-                  / {myCharacter.foundationParams.pow}
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    min="0"
-                    max={myCharacter.foundationParams.pow * 5}
-                    value={myCharacter.san}
-                    onChange={(e) => handleChangeCurrentParam(e, 'san')}
-                  />{' '}
-                  / {myCharacter.foundationParams.pow * 5}
-                  <br />
-                  不定: {myCharacter.foundationParams.pow * 4}
-                </td>
-                <td>{myCharacter.foundationParams.str}</td>
-                <td>{myCharacter.foundationParams.con}</td>
-                <td>{myCharacter.foundationParams.pow}</td>
-                <td>{myCharacter.foundationParams.dex}</td>
-                <td>{myCharacter.foundationParams.app}</td>
-                <td>{myCharacter.foundationParams.siz}</td>
-                <td>{myCharacter.foundationParams.int}</td>
-                <td>{myCharacter.foundationParams.edu}</td>
-                <td>{myCharacter.foundationParams.pow * 5}</td>
-                <td>{myCharacter.foundationParams.int * 5}</td>
-                <td>{myCharacter.foundationParams.edu * 5}</td>
-              </tr>
-            </tbody>
-          </ParamsTable>
-          {skillTab === 'combat' && (
-            <ParamsTable>
-              <thead>
-                <tr>
-                  {myCharacter.combatSkills.map((skill) => (
-                    <th key={`myCharacter-${skill.name}`}>
-                      {skill.name}
-                      {skill.annotation && `(${skill.annotation})`}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  {myCharacter.combatSkills.map((skill) => (
-                    <td key={`myCharacter-${skill.point}`}>
-                      {`${skill.point}%`}
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </ParamsTable>
-          )}
-          {skillTab === 'explore' && (
-            <ParamsTable>
-              <thead>
-                <tr>
-                  {myCharacter.exploreSkills.map((skill) => (
-                    <th key={`myCharacter-${skill.name}`}>
-                      {skill.name}
-                      {skill.annotation && `(${skill.annotation})`}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  {myCharacter.exploreSkills.map((skill) => (
-                    <td key={`myCharacter-${skill.point}`}>
-                      {`${skill.point}%`}
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </ParamsTable>
-          )}
-          {skillTab === 'behavior' && (
-            <ParamsTable>
-              <thead>
-                <tr>
-                  {myCharacter.behaviorSkills.map((skill) => (
-                    <th key={`myCharacter-${skill.name}`}>
-                      {skill.name}
-                      {skill.annotation && `(${skill.annotation})`}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  {myCharacter.behaviorSkills.map((skill) => (
-                    <td key={`myCharacter-${skill.point}`}>
-                      {`${skill.point}%`}
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </ParamsTable>
-          )}
-          {skillTab === 'negotiation' && (
-            <ParamsTable>
-              <thead>
-                <tr>
-                  {myCharacter.negotiationSkills.map((skill) => (
-                    <th key={`myCharacter-${skill.name}`}>
-                      {skill.name}
-                      {skill.annotation && `(${skill.annotation})`}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  {myCharacter.negotiationSkills.map((skill) => (
-                    <td key={`myCharacter-${skill.point}`}>
-                      {`${skill.point}%`}
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </ParamsTable>
-          )}
-          {skillTab === 'knowledge' && (
-            <ParamsTable>
-              <thead>
-                <tr>
-                  {myCharacter.knowledgeSkills.map((skill) => (
-                    <th key={`myCharacter-${skill.name}`}>
-                      {skill.name}
-                      {skill.annotation && `(${skill.annotation})`}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  {myCharacter.knowledgeSkills.map((skill) => (
-                    <td key={`myCharacter-${skill.point}`}>
-                      {`${skill.point}%`}
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </ParamsTable>
-          )}
-        </StatusCard>
+      <SkillSelect>{skillSelectRadioButtons}</SkillSelect>
+      {myCharacterData && generateStatus(myCharacterData, true)}
+      {partyCharactersData.map((partyCharacterData) =>
+        generateStatus(partyCharacterData)
       )}
-      {partyCharacters.map((partyCharacter) => (
-        <StatusCard key={`partyCharacter-${partyCharacter.name}`}>
-          <CardName>{partyCharacter.name}</CardName>
-          <ParamsTable>
-            <thead>
-              <tr>
-                <th>HP</th>
-                <th>MP</th>
-                <th>SAN</th>
-                <th>STR</th>
-                <th>CON</th>
-                <th>POW</th>
-                <th>DEX</th>
-                <th>APP</th>
-                <th>SIZ</th>
-                <th>INT</th>
-                <th>EDU</th>
-                <th>幸運</th>
-                <th>アイデア</th>
-                <th>知識</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  {partyCharacter.hp} /{' '}
-                  {Math.floor(
-                    (partyCharacter.foundationParams.con +
-                      partyCharacter.foundationParams.siz) /
-                      2
-                  )}
-                </td>
-                <td>
-                  {partyCharacter.mp} / {partyCharacter.foundationParams.pow}
-                </td>
-                <td>
-                  {partyCharacter.san} /{' '}
-                  {partyCharacter.foundationParams.pow * 5}
-                  <br />
-                  不定: {partyCharacter.foundationParams.pow * 4}
-                </td>
-                <td>{partyCharacter.foundationParams.str}</td>
-                <td>{partyCharacter.foundationParams.con}</td>
-                <td>{partyCharacter.foundationParams.pow}</td>
-                <td>{partyCharacter.foundationParams.dex}</td>
-                <td>{partyCharacter.foundationParams.app}</td>
-                <td>{partyCharacter.foundationParams.siz}</td>
-                <td>{partyCharacter.foundationParams.int}</td>
-                <td>{partyCharacter.foundationParams.edu}</td>
-                <td>{partyCharacter.foundationParams.pow * 5}</td>
-                <td>{partyCharacter.foundationParams.int * 5}</td>
-                <td>{partyCharacter.foundationParams.edu * 5}</td>
-              </tr>
-            </tbody>
-          </ParamsTable>
-          {skillTab === 'combat' && (
-            <ParamsTable>
-              <thead>
-                <tr>
-                  {partyCharacter.combatSkills.map((skill) => (
-                    <th key={`partyCharacter-${skill.name}`}>
-                      {skill.name}
-                      {skill.annotation && `(${skill.annotation})`}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  {partyCharacter.combatSkills.map((skill) => (
-                    <td key={`partyCharacter-${skill.point}`}>
-                      {`${skill.point}%`}
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </ParamsTable>
-          )}
-          {skillTab === 'explore' && (
-            <ParamsTable>
-              <thead>
-                <tr>
-                  {partyCharacter.exploreSkills.map((skill) => (
-                    <th key={`partyCharacter-${skill.name}`}>
-                      {skill.name}
-                      {skill.annotation && `(${skill.annotation})`}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  {partyCharacter.exploreSkills.map((skill) => (
-                    <td key={`partyCharacter-${skill.point}`}>
-                      {`${skill.point}%`}
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </ParamsTable>
-          )}
-          {skillTab === 'behavior' && (
-            <ParamsTable>
-              <thead>
-                <tr>
-                  {partyCharacter.behaviorSkills.map((skill) => (
-                    <th key={`partyCharacter-${skill.name}`}>
-                      {skill.name}
-                      {skill.annotation && `(${skill.annotation})`}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  {partyCharacter.behaviorSkills.map((skill) => (
-                    <td key={`partyCharacter-${skill.point}`}>
-                      {`${skill.point}%`}
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </ParamsTable>
-          )}
-          {skillTab === 'negotiation' && (
-            <ParamsTable>
-              <thead>
-                <tr>
-                  {partyCharacter.negotiationSkills.map((skill) => (
-                    <th key={`partyCharacter-${skill.name}`}>
-                      {skill.name}
-                      {skill.annotation && `(${skill.annotation})`}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  {partyCharacter.negotiationSkills.map((skill) => (
-                    <td key={`partyCharacter-${skill.point}`}>
-                      {`${skill.point}%`}
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </ParamsTable>
-          )}
-          {skillTab === 'knowledge' && (
-            <ParamsTable>
-              <thead>
-                <tr>
-                  {partyCharacter.knowledgeSkills.map((skill) => (
-                    <th key={`partyCharacter-${skill.name}`}>
-                      {skill.name}
-                      {skill.annotation && `(${skill.annotation})`}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  {partyCharacter.knowledgeSkills.map((skill) => (
-                    <td key={`partyCharacter-${skill.point}`}>
-                      {`${skill.point}%`}
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </ParamsTable>
-          )}
-        </StatusCard>
-      ))}
     </Wrapper>
   );
 };

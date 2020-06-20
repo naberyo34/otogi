@@ -1,7 +1,24 @@
-import { ParamRange } from 'interfaces/param';
+import { AllParamCategory, ParamRange } from 'interfaces/param';
+
+export const allParamCategories: AllParamCategory[] = [
+  { type: 'hp', label: 'HP' },
+  { type: 'mp', label: 'MP' },
+  { type: 'san', label: 'SAN' },
+  { type: 'str', label: 'STR' },
+  { type: 'con', label: 'CON' },
+  { type: 'pow', label: 'POW' },
+  { type: 'dex', label: 'DEX' },
+  { type: 'app', label: 'APP' },
+  { type: 'siz', label: 'SIZ' },
+  { type: 'int', label: 'INT' },
+  { type: 'edu', label: 'EDU' },
+  { type: 'luck', label: '幸運' },
+  { type: 'idea', label: 'アイデア' },
+  { type: 'know', label: '知識' },
+];
 
 // 能力値の名前と、想定しうる最大/最小値
-const params: ParamRange[] = [
+export const paramsRange: ParamRange[] = [
   {
     name: 'str',
     min: 3,
@@ -43,5 +60,3 @@ const params: ParamRange[] = [
     max: 21,
   },
 ];
-
-export default params;

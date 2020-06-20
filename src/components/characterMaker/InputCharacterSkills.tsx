@@ -4,11 +4,7 @@ import styled from 'styled-components';
 import { State } from 'modules';
 import { changeCharacterSkills } from 'modules/characterMaker/actions';
 import Skill, { SkillType, SkillKey } from 'interfaces/skill';
-
-interface Category {
-  name: SkillType;
-  label: string;
-}
+import skillCategories from 'services/skills/skillCategories';
 
 interface TableElements {
   combatTh: JSX.Element[];
@@ -147,29 +143,6 @@ const InputCharacterSkills: React.FC = () => {
     dispatch(changeCharacterSkills({ skillKey, skills: returnSkills }));
   };
 
-  const categories: Category[] = [
-    {
-      name: 'combat',
-      label: '戦闘系技能',
-    },
-    {
-      name: 'explore',
-      label: '探索系技能',
-    },
-    {
-      name: 'behavior',
-      label: '行動系技能',
-    },
-    {
-      name: 'negotiation',
-      label: '交渉系技能',
-    },
-    {
-      name: 'knowledge',
-      label: '知識系技能',
-    },
-  ];
-
   const tableElements: TableElements = {
     combatTh: [],
     combatTd: [],
@@ -186,10 +159,10 @@ const InputCharacterSkills: React.FC = () => {
   const tables: JSX.Element[] = [];
 
   // th, tdを作成してtableElementsにひたすら格納する
-  categories.forEach((category) => {
-    const key = `${category.name}Skills`;
-    const thKey = `${category.name}Th`;
-    const tdKey = `${category.name}Td`;
+  skillCategories.forEach((skillCategory) => {
+    const key = `${skillCategory.type}Skills`;
+    const thKey = `${skillCategory.type}Th`;
+    const tdKey = `${skillCategory.type}Td`;
 
     makingCharacter[key].forEach((skill: Skill) => {
       const th = <th>{skill.name}</th>;
@@ -201,7 +174,7 @@ const InputCharacterSkills: React.FC = () => {
             min={0}
             max={99}
             onChange={(e) =>
-              handleChangeSkillPoint(e, category.name, skill.name)
+              handleChangeSkillPoint(e, skillCategory.type, skill.name)
             }
           />
           {/* annotationキーを持っているときに表示 */}
@@ -213,7 +186,7 @@ const InputCharacterSkills: React.FC = () => {
                 value={skill.annotation}
                 placeholder="未指定"
                 onChange={(e) =>
-                  handleChangeAnnotation(e, category.name, skill.name)
+                  handleChangeAnnotation(e, skillCategory.type, skill.name)
                 }
               />
             </>
@@ -226,12 +199,12 @@ const InputCharacterSkills: React.FC = () => {
   });
 
   // 完成したtableElementsを使って完成形のテーブルを作る
-  categories.forEach((category) => {
-    const thKey = `${category.name}Th`;
-    const tdKey = `${category.name}Td`;
+  skillCategories.forEach((skillCategory) => {
+    const thKey = `${skillCategory.type}Th`;
+    const tdKey = `${skillCategory.type}Td`;
     const table = (
       <>
-        <Title>{category.label}</Title>
+        <Title>{skillCategory.label}</Title>
         <Table>
           <thead>
             <tr>{tableElements[thKey]}</tr>

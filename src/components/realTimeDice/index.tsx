@@ -172,8 +172,8 @@ const Success = styled.p<StyledProps>`
 
 const RealTimeDice: React.FC = () => {
   const dispatch = useDispatch();
-  const myCharacterName = useSelector(
-    (state: State) => state.partyViewer.myCharacterName
+  const myCharacter = useSelector(
+    (state: State) => state.partyViewer.myCharacter
   );
   const showLog = useSelector((state: State) => state.realTimeDice.log.isShow);
   // TODO: 全部Reduxに載せ替えろ どうせやらなくちゃいけないんだ
@@ -211,7 +211,7 @@ const RealTimeDice: React.FC = () => {
     // 成功判定値が0 (未定義) の場合、判定は入れずに結果を返す
     if (successNum === 0) {
       const newResult: Result = {
-        playerName: myCharacterName,
+        playerName: myCharacter,
         dice,
         timestamp: currentDate,
       };
@@ -227,7 +227,7 @@ const RealTimeDice: React.FC = () => {
     if (dice.type === '1D100' && dice.last >= 96) success = 'ファンブル';
 
     const newResult: Result = {
-      playerName: myCharacterName,
+      playerName: myCharacter,
       dice,
       success,
       timestamp: currentDate,
@@ -304,7 +304,7 @@ const RealTimeDice: React.FC = () => {
    * @param rollType ダイスロールのタイプ(グローバル、出目伏せ、ローカル)
    */
   const handleDiceRoll = (rollType: 'global' | 'hiding' | 'local') => {
-    if (!myCharacterName) {
+    if (!myCharacter) {
       alert('先にキャラクターを選択してください');
       return;
     }

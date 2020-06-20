@@ -1,5 +1,3 @@
-import firebase from 'firebase';
-
 // MEMO: FSA準拠の書き方
 export default interface Action {
   type: string;
@@ -7,6 +5,8 @@ export default interface Action {
   error?: boolean;
 }
 
-export interface FirebaseSyncAction extends Action {
-  payload: firebase.firestore.QuerySnapshot;
+export interface SagaAction {
+  start: (payload?: any) => Action;
+  succeed: (payload?: any) => Action;
+  fail: (payload?: any) => Action;
 }
