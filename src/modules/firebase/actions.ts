@@ -16,6 +16,12 @@ export const getCharacters = (payload: any): Action => ({
   payload,
 });
 
+// 同上 こちらはダイスログ
+export const getDicelogs = (payload: any): Action => ({
+  type: types.GET_DICELOGS,
+  payload,
+});
+
 // characterMakerで新規キャラクターの作成ボタンを押したときに発行
 // 入力したキャラクター情報をpayloadとして、Saga側でFirestoreへの追加処理を行う
 export const addCharacter: SagaAction = {

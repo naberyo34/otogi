@@ -1,6 +1,5 @@
 import firebase from 'firebase';
 import types from 'modules/firebase/actionTypes';
-import { UpdateCharacterPayload } from 'modules/firebase/actions';
 import Action from 'interfaces/action';
 import Character from 'interfaces/character';
 
