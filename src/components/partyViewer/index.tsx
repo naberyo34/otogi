@@ -301,7 +301,7 @@ const PartyViewer: React.FC = () => {
             <tr>
               {targetSkills.map((targetSkill) => (
                 <td key={`${character.name}-${targetSkill.name}-point`}>
-                  {`${targetSkill.point} %`}
+                  {`${targetSkill.point}%`}
                 </td>
               ))}
             </tr>

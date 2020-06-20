@@ -31,7 +31,7 @@ export const addCharacter: SagaAction = {
   }),
 };
 
-// キャラクターを編集、partyViewerで値を変更したときなど汎用的に使えるキャラクター更新処理
+// partyViewerで値を変更したときに発行
 export const updateCharacter: SagaAction = {
   start: (payload: UpdateCharacterPayload) => ({
     type: types.UPDATE_CHARACTER_START,

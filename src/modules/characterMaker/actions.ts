@@ -2,6 +2,7 @@ import types from 'modules/characterMaker/actionTypes';
 import Action from 'interfaces/action';
 import Param from 'interfaces/param';
 import Skill, { SkillKey } from 'interfaces/skill';
+import Character from 'interfaces/character';
 
 interface SkillsPayload {
   skillKey: SkillKey;
@@ -23,6 +24,12 @@ export const changeCharacterSkills = (payload: SkillsPayload): Action => ({
   payload,
 });
 
-export const toggleEditMode = (): Action => ({
-  type: types.TOGGLE_EDIT_MODE,
+export const changeEditCharacter = (payload: string): Action => ({
+  type: types.CHANGE_EDIT_CHARACTER,
+  payload,
+});
+
+export const setCharacterAllParams = (payload: Character): Action => ({
+  type: types.SET_CHARACTER_ALL_PARAMS,
+  payload,
 });

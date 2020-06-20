@@ -32,13 +32,13 @@ export const initialCharacter: Character = {
 
 export interface CharacterMakerState {
   makingCharacter: Character;
-  isEditMode: boolean;
+  editCharacter: string;
 }
 
 // stateの初期化
 const initialState: CharacterMakerState = {
   makingCharacter: initialCharacter,
-  isEditMode: false,
+  editCharacter: '',
 };
 
 // Reducerの定義
@@ -80,11 +80,18 @@ const characterMaker = (
         },
       };
     }
-    // 新規作成 / 編集の切り替え
-    case types.TOGGLE_EDIT_MODE: {
+    // 編集キャラクターの切り替え (空文字は新規作成として判定する)
+    case types.CHANGE_EDIT_CHARACTER: {
       return {
         ...state,
-        isEditMode: !state.isEditMode,
+        editCharacter: action.payload,
+      };
+    }
+    // makingCharacterを一括で書き換える (既存キャラクターをロードしたときなどに使用)
+    case types.SET_CHARACTER_ALL_PARAMS: {
+      return {
+        ...state,
+        makingCharacter: action.payload,
       };
     }
     default:

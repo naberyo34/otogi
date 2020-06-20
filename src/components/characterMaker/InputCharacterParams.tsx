@@ -39,7 +39,7 @@ const Table = styled.table`
 
 const InputCharacterParams: React.FC = () => {
   const dispatch = useDispatch();
-  const FoundationParams = useSelector(
+  const foundationParams = useSelector(
     (state: State) => state.characterMaker.makingCharacter.foundationParams
   );
 
@@ -55,7 +55,7 @@ const InputCharacterParams: React.FC = () => {
     const { value } = e.target;
     const valueInt = parseInt(value, 10);
 
-    FoundationParams[paramType] = valueInt;
+    foundationParams[paramType] = valueInt;
     dispatch(changeCharacterParams({ name: paramType, point: valueInt }));
   };
 
@@ -87,6 +87,7 @@ const InputCharacterParams: React.FC = () => {
       <select
         key={`select-${paramType}`}
         onChange={(e) => handleChooseParams(e, paramType)}
+        value={foundationParams[paramType]}
       >
         {options}
       </select>
