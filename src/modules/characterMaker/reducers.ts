@@ -1,101 +1,44 @@
-import { Action } from './actions';
-import types from './actionTypes';
-
-interface VariableParams {
-  max: number;
-  current: number;
-}
-
-interface San extends VariableParams {
-  madness: number;
-}
-
-interface Skill {
-  combat: string;
-  explore: string;
-  behavior: string;
-  negotiation: string;
-  knowledge: string;
-  // 何を指定しようがstringが返ってくる
-  [key: string]: string;
-}
-
-export interface Character {
-  name: string;
-  str: number;
-  con: number;
-  pow: number;
-  dex: number;
-  app: number;
-  siz: number;
-  int: number;
-  edu: number;
-  luck: number;
-  idea: number;
-  know: number;
-  hp: VariableParams;
-  mp: VariableParams;
-  san: San;
-  skill: Skill;
-  // 変数でキーを参照したときに怒られないよう、全パターンを列挙
-  [key: string]: string | number | VariableParams | San | Skill;
-}
-
-// export interface Status {
-//   name: string;
-//   value: string;
-// }
+import types from 'modules/characterMaker/actionTypes';
+import Action from 'interfaces/action';
+import Character from 'interfaces/character';
+import combatSkills from 'services/skills/combatSkills';
+import exploreSkills from 'services/skills/exploreSkills';
+import behaviorSkills from 'services/skills/behaviorSkills';
+import negotiationSkills from 'services/skills/negotiationSkills';
+import knowledgeSkills from 'services/skills/knowledgeSkills';
 
 // 初期パラメータとして挿入されるキャラクターのデータ(すべて最低値)
 export const initialCharacter: Character = {
   name: '',
-  str: 3,
-  con: 3,
-  pow: 3,
-  dex: 3,
-  app: 3,
-  siz: 8,
-  int: 8,
-  edu: 6,
-  // POW * 5
-  luck: 15,
-  // INT * 5
-  idea: 40,
-  // EDU * 5
-  know: 30,
-  // CON + SIZ / 2 (切り捨て)
-  hp: {
-    max: 5,
-    current: 5,
+  foundationParams: {
+    str: 3,
+    con: 3,
+    pow: 3,
+    dex: 3,
+    app: 3,
+    siz: 8,
+    int: 8,
+    edu: 6,
   },
-  // POW
-  mp: {
-    max: 3,
-    current: 3,
-  },
-  // POW * 5
-  san: {
-    max: 15,
-    current: 15,
-    // max - (max / 5)
-    madness: 12,
-  },
-  skill: {
-    combat: '',
-    explore: '',
-    behavior: '',
-    negotiation: '',
-    knowledge: '',
-  },
+  hp: 5,
+  mp: 3,
+  san: 15,
+  combatSkills,
+  exploreSkills,
+  behaviorSkills,
+  negotiationSkills,
+  knowledgeSkills,
 };
 
 export interface CharacterMakerState {
-  character: Character;
+  makingCharacter: Character;
+  editCharacter: string;
 }
 
 // stateの初期化
 const initialState: CharacterMakerState = {
-  character: initialCharacter,
+  makingCharacter: initialCharacter,
+  editCharacter: '',
 };
 
 // Reducerの定義
@@ -105,38 +48,50 @@ const characterMaker = (
 ): CharacterMakerState => {
   switch (action.type) {
     // 名前を入力したとき
-    case types.SET_CHARACTER_NAME: {
+    case types.CHANGE_CHARACTER_NAME: {
       return {
-        // character以外のstateは変更しない
         ...state,
-        character: {
-          // characterも指定要素以外は変更しない
-          ...state.character,
+        makingCharacter: {
+          ...state.makingCharacter,
           name: action.payload,
         },
       };
     }
     // STRなどの値を変更したとき
-    case types.SET_CHARACTER_PARAMS: {
+    case types.CHANGE_CHARACTER_PARAMS: {
       return {
         ...state,
-        character: {
-          ...state.character,
-          ...action.payload,
+        makingCharacter: {
+          ...state.makingCharacter,
+          foundationParams: {
+            ...state.makingCharacter.foundationParams,
+            [action.payload.name]: action.payload.point,
+          },
         },
       };
     }
     // 技能欄に入力したとき
-    case types.SET_CHARACTER_SKILL: {
+    case types.CHANGE_CHARACTER_SKILLS: {
       return {
         ...state,
-        character: {
-          ...state.character,
-          skill: {
-            ...state.character.skill,
-            ...action.payload,
-          },
+        makingCharacter: {
+          ...state.makingCharacter,
+          [action.payload.skillKey]: action.payload.skills,
         },
+      };
+    }
+    // 編集キャラクターの切り替え (空文字は新規作成として判定する)
+    case types.CHANGE_EDIT_CHARACTER: {
+      return {
+        ...state,
+        editCharacter: action.payload,
+      };
+    }
+    // makingCharacterを一括で書き換える (既存キャラクターをロードしたときなどに使用)
+    case types.SET_CHARACTER_ALL_PARAMS: {
+      return {
+        ...state,
+        makingCharacter: action.payload,
       };
     }
     default:

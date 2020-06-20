@@ -1,10 +1,14 @@
 import { combineReducers } from 'redux';
-import realTimeDice, { RealTimeDiceState } from './realTimeDice/reducers';
-import partyViewer, { PartyViewerState } from './partyViewer/reducers';
-import characterMaker, { CharacterMakerState } from './characterMaker/reducers';
+import firebaseReducer, { FirebaseState } from 'modules/firebase/reducers';
+import realTimeDice, { RealTimeDiceState } from 'modules/realTimeDice/reducers';
+import partyViewer, { PartyViewerState } from 'modules/partyViewer/reducers';
+import characterMaker, {
+  CharacterMakerState,
+} from 'modules/characterMaker/reducers';
 
 // 全Stateを結合
 export interface State {
+  firebaseReducer: FirebaseState;
   realTimeDice: RealTimeDiceState;
   partyViewer: PartyViewerState;
   characterMaker: CharacterMakerState;
@@ -12,6 +16,7 @@ export interface State {
 
 // 全Reducerを結合
 export default combineReducers({
+  firebaseReducer,
   realTimeDice,
   partyViewer,
   characterMaker,
