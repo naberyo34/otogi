@@ -15,5 +15,4 @@
 - Redux, React-Redux
 - React Router
 - Firebase
-## メモ
-- ReduxとFirebaseはどう組み合わせるか……Saga入れたほうがいいかも
+- Redux-Saga, redux-saga-firebase
