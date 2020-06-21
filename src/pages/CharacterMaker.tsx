@@ -110,7 +110,7 @@ const CharacterMaker: React.FC = () => {
     // 新規作成
     // 計算が必要な能力値をすべて算出し, Firestoreに新規データを追加
     if (!editCharacter) {
-      const hp = Math.floor(
+      const hp = Math.round(
         (makingCharacter.foundationParams.con +
           makingCharacter.foundationParams.siz) /
           2

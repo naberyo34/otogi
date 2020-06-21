@@ -185,7 +185,7 @@ const PartyViewer: React.FC = () => {
   ) => {
     const characterAllParams: AllParams = {
       hp: character.hp,
-      maxhp: Math.floor(
+      maxhp: Math.round(
         (character.foundationParams.con + character.foundationParams.siz) / 2
       ),
       mp: character.mp,
