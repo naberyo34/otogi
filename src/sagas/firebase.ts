@@ -26,9 +26,7 @@ function* runAddCharacter(action: Action) {
     alert('データの送信に成功しました!');
   } catch (err) {
     yield put(addCharacter.fail());
-    alert(
-      'データの送信に失敗しました。このエラーが何度も起きる場合は、開発チームまでお問い合わせください'
-    );
+    alert('データの送信に失敗しました');
   }
 }
 
@@ -45,9 +43,7 @@ function* runUpdateCharacter(action: Action) {
     yield put(updateCharacter.succeed());
   } catch (err) {
     yield put(updateCharacter.fail());
-    alert(
-      'データの更新に失敗しました。このエラーが何度も起きる場合は、開発チームまでお問い合わせください'
-    );
+    alert('データの更新に失敗しました');
   }
 }
 

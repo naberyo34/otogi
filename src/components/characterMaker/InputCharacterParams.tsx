@@ -55,7 +55,6 @@ const InputCharacterParams: React.FC = () => {
     const { value } = e.target;
     const valueInt = parseInt(value, 10);
 
-    foundationParams[paramType] = valueInt;
     dispatch(changeCharacterParams({ name: paramType, point: valueInt }));
   };
 
@@ -114,7 +113,7 @@ const InputCharacterParams: React.FC = () => {
 
   return (
     <Wrapper>
-      <Title>能力値</Title>
+      <Title>基礎ステータス (変更不可)</Title>
       <Table>
         <thead>
           <tr>{thArray}</tr>

@@ -37,6 +37,13 @@ const PartyForm = styled.form`
 
 const SkillSelect = styled.div`
   margin-top: 16px;
+  font-size: 1.2rem;
+
+  input {
+    &:not(:first-child) {
+      margin-left: 8px;
+    }
+  }
 `;
 
 const Status = styled.div`
@@ -150,19 +157,21 @@ const PartyViewer: React.FC = () => {
     paramType: 'hp' | 'mp' | 'san'
   ) => {
     const { value } = e.target;
-    // バリデーション
-    if (!value) {
-      alert('入力値が不正です。数値のみが入力できます');
-      return;
-    }
-    if (!myCharacter) {
-      alert(
-        'マイキャラクターが設定されていません。もしこのエラーが出たら開発チームまでご連絡ください'
-      );
+    let valueInt = parseInt(value, 10);
+
+    // valueIntがNaNのときは0として扱う
+    if (!valueInt) valueInt = 0;
+    // 0未満、100以上の値は弾く
+    if (valueInt < 0 || valueInt > 99) {
+      alert('入力値が小さすぎるか大きすぎます。0 ~ 99 が入力できます');
       return;
     }
 
-    const valueInt = parseInt(value, 10);
+    // マイキャラクターが見つからない(想定外)場合は致命的なエラーを返す
+    if (!myCharacter) {
+      alert('FATAL ERR: マイキャラクターが見つかりません');
+      return;
+    }
 
     // Saga経由でFirestoreを更新
     dispatch(
@@ -239,7 +248,7 @@ const PartyViewer: React.FC = () => {
                           type="number"
                           min={0}
                           max={isSan ? 99 : max}
-                          value={current}
+                          value={current === 0 ? '' : current}
                           onChange={(e) =>
                             handleChangeCurrentParam(e, paramType)
                           }
@@ -345,12 +354,12 @@ const PartyViewer: React.FC = () => {
       <React.Fragment key={`${skillCategory.type}-radio`}>
         <input
           type="radio"
-          name="skill"
+          id={skillCategory.type}
           value={skillCategory.type}
           checked={selectedSkillView === skillCategory.type}
           onChange={(e) => handleChangeSkillView(e)}
         />
-        <span>{skillCategory.label}</span>
+        <label htmlFor={skillCategory.type}>{skillCategory.label}</label>
       </React.Fragment>
     );
 

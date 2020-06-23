@@ -65,8 +65,10 @@ const InputCharacterSkills: React.FC = () => {
     skillName: string
   ) => {
     const { value } = e.target;
-    const valueInt = parseInt(value, 10);
+    let valueInt = parseInt(value, 10);
 
+    // valueIntがNaNのときは0として扱う
+    if (!valueInt) valueInt = 0;
     // 0未満、100以上の値は弾く
     if (valueInt < 0 || valueInt > 99) {
       alert('入力値が小さすぎるか大きすぎます。0 ~ 99 が入力できます');
@@ -86,15 +88,13 @@ const InputCharacterSkills: React.FC = () => {
     );
 
     if (!target) {
-      alert(
-        '対象のスキルが見つかりません。もしこのエラーが出たら開発チームまでご連絡ください'
-      );
+      alert('FATAL ERR: 対象のスキルが見つかりません');
       return;
     }
 
     // 対象スキルがアノテーションを含む場合は、newSkillにもアノテーションを入れる
     if (target.annotation || target.annotation === '') {
-      newSkill.annotation = target?.annotation;
+      newSkill.annotation = target.annotation;
     }
 
     // 対象スキルが配列のどこにあるか検索し、そこだけ新しい情報に置換する
@@ -103,12 +103,11 @@ const InputCharacterSkills: React.FC = () => {
     );
     currentSkills.splice(targetIndex, 1, newSkill);
 
-    // 念のため新たな配列を作り直し、Storeに反映
-    const returnSkills = [...currentSkills];
-    dispatch(changeCharacterSkills({ skillKey, skills: returnSkills }));
+    // Storeを更新
+    dispatch(changeCharacterSkills({ skillKey, skills: currentSkills }));
   };
 
-  // アノテーション(ex: 芸術(BL)のような注釈)を変更したときにStoreを更新する
+  // アノテーション(ex: 芸術(絵画)のような注釈)を変更したときにStoreを更新する
   const handleChangeAnnotation = (
     e: React.ChangeEvent<HTMLInputElement>,
     skillType: SkillType,
@@ -122,9 +121,7 @@ const InputCharacterSkills: React.FC = () => {
     );
 
     if (!target) {
-      alert(
-        '対象のスキルが見つかりません。もしこのエラーが出たら開発チームまでご連絡ください'
-      );
+      alert('FATAL ERR: 対象のスキルが見つかりません');
       return;
     }
 
@@ -170,7 +167,7 @@ const InputCharacterSkills: React.FC = () => {
         <td>
           <input
             type="number"
-            value={skill.point}
+            value={skill.point === 0 ? '' : skill.point}
             min={0}
             max={99}
             onChange={(e) =>
