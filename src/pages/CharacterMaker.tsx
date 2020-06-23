@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import {
@@ -21,8 +21,9 @@ const Title = styled.h2`
   font-size: 1.6rem;
 `;
 
-const SubTitle = styled.h3`
-  font-size: 1.6rem;
+const Description = styled.p`
+  margin-top: 8px;
+  font-size: 1.2rem;
 `;
 
 const SelectEdit = styled.select`
@@ -62,7 +63,13 @@ const CharacterMaker: React.FC = () => {
     (state: State) => state.firebaseReducer.characters
   );
 
-  // 名前欄に入力した内容をStoreにも反映
+  // Storeの初期化
+  const initialize = () => {
+    dispatch(changeEditCharacter(''));
+    dispatch(setCharacterAllParams(initialCharacter));
+  };
+
+  // 名前欄に入力した内容をStoreに反映
   const handleMakingCharacterName = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -88,9 +95,7 @@ const CharacterMaker: React.FC = () => {
     );
 
     if (!targetCharacter) {
-      alert(
-        '編集対象キャラクターが見つかりません。開発チームまでお問い合わせください'
-      );
+      alert('FATAL ERR: 編集対象キャラクターが見つかりません');
       return;
     }
 
@@ -98,7 +103,6 @@ const CharacterMaker: React.FC = () => {
     dispatch(setCharacterAllParams(targetCharacter));
   };
 
-  // submit
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -107,8 +111,7 @@ const CharacterMaker: React.FC = () => {
       return;
     }
 
-    // 新規作成
-    // 計算が必要な能力値をすべて算出し, Firestoreに新規データを追加
+    // 新規作成時は計算が必要な能力値をすべて算出し, Firestoreに新規データを追加
     if (!editCharacter) {
       const hp = Math.round(
         (makingCharacter.foundationParams.con +
@@ -124,28 +127,29 @@ const CharacterMaker: React.FC = () => {
         san,
       };
 
-      // actionを発行し、SagaでFirestoreに追加
+      // actionを発行し、Saga経由でFirestoreに追加
       dispatch(addCharacter.start(submitCharacter));
-      return;
     }
 
-    // 既存キャラクターの場合は、そのままmakingCharacterをFirestoreに反映
+    // 既存キャラクター編集の場合は、そのままmakingCharacterをFirestoreに反映
     dispatch(addCharacter.start(makingCharacter));
   };
+
+  useEffect(() => {
+    initialize();
+  }, []);
 
   return (
     <Wrapper>
       <Title>キャラクターメーカー (beta ver.)</Title>
-      <p>※いまのところクトゥルフ神話TRPG 旧ルールフォーマットのみ対応</p>
-      <p>
+      <Description>
+        いまのところクトゥルフ神話TRPG 旧ルールフォーマットのみ対応。
+        <br />
         開発中のため、他サービスで作成済のキャラクターを投入して使ってください。
-      </p>
+        <br />
+        ※スキルの数値が空欄の場合は0として扱います。
+      </Description>
       <form onSubmit={(e) => handleSubmit(e)}>
-        <SubTitle>
-          {editCharacter
-            ? 'キャラクターを編集する'
-            : '新規キャラクターを作成する'}
-        </SubTitle>
         <SelectEdit onChange={(e) => handleChangeEditCharacter(e)}>
           <option value="">新規作成</option>
           {characters.map((character) => (
@@ -159,16 +163,16 @@ const CharacterMaker: React.FC = () => {
         </SelectEdit>
         {!editCharacter && (
           <>
-            <PlayerName>プレイヤー名(変更不可)</PlayerName>
+            <PlayerName>プレイヤー名 (変更不可)</PlayerName>
             <InputName
               type="text"
               placeholder="五味 葛男"
               onChange={(e) => handleMakingCharacterName(e)}
               value={makingCharacter.name}
             />
+            <InputCharacterParams />
           </>
         )}
-        <InputCharacterParams />
         <InputCharacterSkills />
         <Submit
           type="submit"
