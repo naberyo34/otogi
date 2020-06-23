@@ -19,7 +19,7 @@ const Wrapper = styled.section`
   width: calc(100vw - 320px);
   min-width: 640px;
   height: 90vh;
-  padding: 16px;
+  padding: 0 16px;
   overflow-y: scroll;
 `;
 
@@ -36,8 +36,11 @@ const PartyForm = styled.form`
 `;
 
 const SkillSelect = styled.div`
-  margin-top: 16px;
+  position: sticky;
+  top: 0;
+  padding: 16px 0;
   font-size: 1.2rem;
+  background: white;
 
   input {
     &:not(:first-child) {
