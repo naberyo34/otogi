@@ -19,7 +19,7 @@ const Wrapper = styled.section`
   width: calc(100vw - 320px);
   min-width: 640px;
   height: 90vh;
-  padding: 16px;
+  padding: 0 16px;
   overflow-y: scroll;
 `;
 
@@ -36,8 +36,11 @@ const PartyForm = styled.form`
 `;
 
 const SkillSelect = styled.div`
-  margin-top: 16px;
+  position: sticky;
+  top: 0;
+  padding: 16px 0;
   font-size: 1.2rem;
+  background: white;
 
   input {
     &:not(:first-child) {
@@ -85,18 +88,12 @@ const PartyViewer: React.FC = () => {
   const characters = useSelector(
     (state: State) => state.firebaseReducer.characters
   );
-  const myCharacter = useSelector(
-    (state: State) => state.partyViewer.myCharacter
-  );
-  const selectedCharacter = useSelector(
-    (state: State) => state.partyViewer.selectedCharacter
-  );
-  const partyCharacters = useSelector(
-    (state: State) => state.partyViewer.partyCharacters
-  );
-  const selectedSkillView = useSelector(
-    (state: State) => state.partyViewer.selectedSkillView
-  );
+  const {
+    myCharacter,
+    selectedCharacter,
+    partyCharacters,
+    selectedSkillView,
+  } = useSelector((state: State) => state.partyViewer);
 
   /**
    * partyCharacters(String[])から実データ(Character[])を生成

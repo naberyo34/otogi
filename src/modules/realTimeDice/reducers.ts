@@ -1,18 +1,25 @@
 import types from 'modules/realTimeDice/actionTypes';
 import Action from 'interfaces/action';
+import { Result, RollingType } from 'interfaces/dice';
 
 // stateの型定義
 export interface RealTimeDiceState {
-  log: {
-    isShow: boolean;
-  };
+  diceCount: number;
+  diceSize: number;
+  judgementNumber: number;
+  rollingType: RollingType;
+  globalResult?: Result;
+  localResult?: Result;
+  diceLog: boolean;
 }
 
 // stateの初期化
 const initialState: RealTimeDiceState = {
-  log: {
-    isShow: false,
-  },
+  diceCount: 1,
+  diceSize: 100,
+  judgementNumber: 0,
+  rollingType: false,
+  diceLog: false,
 };
 
 // Reducerの定義
@@ -21,12 +28,46 @@ const RealTimeDice = (
   action: Action
 ): RealTimeDiceState => {
   switch (action.type) {
-    case types.TOGGLE_LOG: {
+    case types.SET_DICE_COUNT: {
       return {
         ...state,
-        log: {
-          isShow: !state.log.isShow,
-        },
+        diceCount: action.payload,
+      };
+    }
+    case types.SET_DICE_SIZE: {
+      return {
+        ...state,
+        diceSize: action.payload,
+      };
+    }
+    case types.SET_JUDGEMENT_NUMBER: {
+      return {
+        ...state,
+        judgementNumber: action.payload,
+      };
+    }
+    case types.SET_ROLLING_TYPE: {
+      return {
+        ...state,
+        rollingType: action.payload,
+      };
+    }
+    case types.SET_GLOBAL_RESULT: {
+      return {
+        ...state,
+        globalResult: action.payload,
+      };
+    }
+    case types.SET_LOCAL_RESULT: {
+      return {
+        ...state,
+        localResult: action.payload,
+      };
+    }
+    case types.TOGGLE_DICE_LOG: {
+      return {
+        ...state,
+        diceLog: !state.diceLog,
       };
     }
     default:

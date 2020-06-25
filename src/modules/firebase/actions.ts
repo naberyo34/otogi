@@ -1,6 +1,7 @@
 import types from 'modules/firebase/actionTypes';
 import Action, { SagaAction } from 'interfaces/action';
 import Character from 'interfaces/character';
+import { Result } from 'interfaces/dice';
 
 export interface UpdateCharacterPayload {
   target: string;
@@ -34,6 +35,21 @@ export const addCharacter: SagaAction = {
   }),
   fail: () => ({
     type: types.ADD_CHARACTER_FAIL,
+  }),
+};
+
+// realTimeDiceでダイスを振ったときに発行
+// ダイス結果をpayloadとして、Saga側でFirestoreへの追加処理を行う
+export const addDiceLog: SagaAction = {
+  start: (payload: Result) => ({
+    type: types.ADD_DICELOG_START,
+    payload,
+  }),
+  succeed: () => ({
+    type: types.ADD_DICELOG_SUCCEED,
+  }),
+  fail: () => ({
+    type: types.ADD_DICELOG_FAIL,
   }),
 };
 

@@ -12,6 +12,10 @@ const myFirebaseApp = firebase.initializeApp({
   appId: '1:997195048792:web:f17fd6f1cd4d0bc982272d',
 });
 const reduxSagaFirebase = new ReduxSagaFirebase(myFirebaseApp);
-// TODO: 移行中だけど、取り急ぎSagaを噛ませずにFirebaseにアクセスしたときはこちらをインポート
-export const firestore = myFirebaseApp.firestore();
+
 export default reduxSagaFirebase;
+// TODO: anyでキャストしてreduxSagaFirebaseを黙らせている. 多分パッケージ側の問題
+export const diceLogsQuery = myFirebaseApp
+  .firestore()
+  .collection('dicelogs')
+  .orderBy('timestamp', 'asc');
