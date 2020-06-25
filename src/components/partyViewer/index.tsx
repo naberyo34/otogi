@@ -88,18 +88,12 @@ const PartyViewer: React.FC = () => {
   const characters = useSelector(
     (state: State) => state.firebaseReducer.characters
   );
-  const myCharacter = useSelector(
-    (state: State) => state.partyViewer.myCharacter
-  );
-  const selectedCharacter = useSelector(
-    (state: State) => state.partyViewer.selectedCharacter
-  );
-  const partyCharacters = useSelector(
-    (state: State) => state.partyViewer.partyCharacters
-  );
-  const selectedSkillView = useSelector(
-    (state: State) => state.partyViewer.selectedSkillView
-  );
+  const {
+    myCharacter,
+    selectedCharacter,
+    partyCharacters,
+    selectedSkillView,
+  } = useSelector((state: State) => state.partyViewer);
 
   /**
    * partyCharacters(String[])から実データ(Character[])を生成

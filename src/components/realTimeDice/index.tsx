@@ -1,25 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { firestore } from 'services/firebase';
-import diceRoll, { DiceResult, HiddenDiceResult } from 'services/diceRoll';
+import diceRoll from 'services/diceRoll';
 import formatDate from 'services/formatDate';
 import generateRandomId from 'services/generateRandomId';
 import { State } from 'modules/index';
-import toggleLog from 'modules/realTimeDice/actions';
+import {
+  setDiceCount,
+  setDiceSize,
+  setJudgementNumber,
+  setRollingType,
+  setGlobalResult,
+  setLocalResult,
+  toggleDiceLog,
+} from 'modules/realTimeDice/actions';
+import { Result, HiddenDice } from 'interfaces/dice';
 import Sound from 'components/realTimeDice/Sound';
-
-interface Result {
-  id?: string;
-  playerName: string;
-  dice: DiceResult | HiddenDiceResult;
-  success?: string;
-  timestamp: string;
-}
 
 interface StyledProps {
   isShow?: boolean;
-  emphasis?: boolean;
+  isEmphasize?: boolean;
 }
 
 const Wrapper = styled.section`
@@ -164,9 +165,9 @@ const PlayerName = styled.span`
   color: red;
 `;
 
-const Success = styled.p<StyledProps>`
+const Judgement = styled.p<StyledProps>`
   font-size: 2.4rem;
-  color: ${(props) => (props.emphasis ? 'red' : 'inherit')};
+  color: ${(props) => (props.isEmphasize ? 'red' : 'inherit')};
   visibility: ${(props) => (props.isShow ? 'visible' : 'hidden')};
   opacity: ${(props) => (props.isShow ? '1' : '0')};
 `;
@@ -176,29 +177,15 @@ const RealTimeDice: React.FC = () => {
   const myCharacter = useSelector(
     (state: State) => state.partyViewer.myCharacter
   );
-  const showLog = useSelector((state: State) => state.realTimeDice.log.isShow);
-  // TODO: 全部Reduxに載せ替えろ どうせやらなくちゃいけないんだ
-  const [rollingGlobal, setRollingGlobal] = useState<boolean>(false);
-  const [rollingLocal, setRollingLocal] = useState<boolean>(false);
-  const [diceCount, setDiceCount] = useState({ value: '1' });
-  const [diceSize, setDiceSize] = useState({ value: '100' });
-  const [successNum, setSuccessNum] = useState<number>(0);
-  // TODO: firebaseのDocumentData型とResult型を併用する方法が不明 気に入らない
-  const [currentResult, setCurrentResult] = useState<
-    firebase.firestore.DocumentData
-  >({
-    playerName: '',
-    dice: {
-      type: '',
-      single: [],
-      last: 0,
-    },
-    timestamp: '',
-  });
-  const [localResult, setLocalResult] = useState<Result | false>(false);
-  const [resultLog, setResultLog] = useState<firebase.firestore.DocumentData>(
-    []
-  );
+  const {
+    diceCount,
+    diceSize,
+    judgementNumber,
+    rollingType,
+    globalResult,
+    localResult,
+    diceLog,
+  } = useSelector((state: State) => state.realTimeDice);
 
   /**
    * ダイス結果を生成
@@ -206,11 +193,11 @@ const RealTimeDice: React.FC = () => {
    * @return newResult Result型。ダイス結果
    */
   const makeResult = (): Result => {
-    const dice = diceRoll(Number(diceCount.value), Number(diceSize.value));
+    const dice = diceRoll(diceCount, diceSize);
     const currentDate = formatDate(new Date());
 
     // 成功判定値が0 (未定義) の場合、判定は入れずに結果を返す
-    if (successNum === 0) {
+    if (judgementNumber === 0) {
       const newResult: Result = {
         playerName: myCharacter,
         dice,
@@ -221,16 +208,16 @@ const RealTimeDice: React.FC = () => {
     }
 
     // 成功判定値が設定されている場合、判定を入れて結果を返す
-    let success = dice.last <= successNum ? '成功' : '失敗';
+    let judgement = dice.last <= judgementNumber ? '成功' : '失敗';
 
     // もしクリティカルかファンブルが出ているなら、その結果を返す
-    if (dice.type === '1D100' && dice.last <= 5) success = 'クリティカル';
-    if (dice.type === '1D100' && dice.last >= 96) success = 'ファンブル';
+    if (dice.type === '1D100' && dice.last <= 5) judgement = 'クリティカル';
+    if (dice.type === '1D100' && dice.last >= 96) judgement = 'ファンブル';
 
     const newResult: Result = {
       playerName: myCharacter,
       dice,
-      success,
+      judgement,
       timestamp: currentDate,
     };
 
@@ -245,18 +232,16 @@ const RealTimeDice: React.FC = () => {
     // rollTypeに応じて待ちを発生させる
     switch (rollType) {
       case 'global':
-        setRollingGlobal(true);
-        setTimeout(() => setRollingGlobal(false), 1000);
+        dispatch(setRollingType('global'));
+        setTimeout(() => dispatch(setRollingType(false)), 1000);
         break;
       case 'hiding':
-        setRollingGlobal(true);
-        setRollingLocal(true);
-        setTimeout(() => setRollingGlobal(false), 1000);
-        setTimeout(() => setRollingLocal(false), 1000);
+        dispatch(setRollingType('hiding'));
+        setTimeout(() => dispatch(setRollingType(false)), 1000);
         break;
       case 'local':
-        setRollingLocal(true);
-        setTimeout(() => setRollingLocal(false), 1000);
+        dispatch(setRollingType('local'));
+        setTimeout(() => dispatch(setRollingType(false)), 1000);
         break;
       default:
     }
@@ -269,35 +254,40 @@ const RealTimeDice: React.FC = () => {
   // ダイスの個数(回数)を設定
   const handleChooseDiceCount = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
-    setDiceCount({ value });
+    if (!value) return;
+    const valueInt = parseInt(value, 10);
+
+    dispatch(setDiceCount(valueInt));
   };
 
   // ダイスの面数を設定
   const handleChooseDiceSize = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
-    setDiceSize({ value });
+    if (!value) return;
+
+    const valueInt = parseInt(value, 10);
+    dispatch(setDiceSize(valueInt));
   };
 
   // 成功判定値を設定
   const handleInputSucessNum = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    const successNumDOM: HTMLInputElement | null = document.querySelector(
-      '#js-successNum'
-    );
-    // バリデーション
     if (!value) return;
 
+    const judgementNumberDOM: HTMLInputElement | null = document.querySelector(
+      '#js-judgementNumber'
+    );
     const valueInt = parseInt(value, 10);
 
     // 1未満、100以上の値は弾く
     if (valueInt < 1 || valueInt > 99) {
-      if (successNumDOM) successNumDOM.value = '';
-      setSuccessNum(0);
+      if (judgementNumberDOM) judgementNumberDOM.value = '';
+      dispatch(setJudgementNumber(0));
       alert('入力値が小さすぎるか大きすぎます。1 ~ 99 が入力できます');
       return;
     }
 
-    setSuccessNum(valueInt);
+    dispatch(setJudgementNumber(valueInt));
   };
 
   /**
@@ -311,19 +301,19 @@ const RealTimeDice: React.FC = () => {
     }
 
     const newResult = makeResult();
-    const successNumDOM: HTMLInputElement | null = document.querySelector(
-      '#js-successNum'
+    const judgementNumberDOM: HTMLInputElement | null = document.querySelector(
+      '#js-judgementNumber'
     );
     // MEMO: hidingのときしか使わないが, switch内で変数宣言すると怒られる
-    const hiddenDiceResult: HiddenDiceResult = {
+    const hiddenDice: HiddenDice = {
       type: '何か',
       single: '????',
       last: '????',
     };
     const hiddenResult: Result = {
       playerName: newResult.playerName,
-      dice: hiddenDiceResult,
-      success: '????',
+      dice: hiddenDice,
+      judgement: '????',
       timestamp: newResult.timestamp,
     };
 
@@ -336,57 +326,27 @@ const RealTimeDice: React.FC = () => {
       case 'hiding':
         firestore.collection('result').add(hiddenResult);
         // localResultにのみ結果を表示
-        // TODO: いくらなんでもこのsetTimeoutはお粗末すぎる
-        setTimeout(() => setLocalResult(newResult), 500);
+        dispatch(setLocalResult(newResult));
         break;
       // ローカルダイスロール(ブラウザ内で見れるのみ, Firestoreに送信しない)
       case 'local':
         dicePerformance('local');
         // localResultにのみ結果を表示
-        setLocalResult(newResult);
+        dispatch(setLocalResult(newResult));
         break;
       default:
         break;
     }
+
     // 成功判定値欄を0に戻す
-    setSuccessNum(0);
-    if (successNumDOM) successNumDOM.value = '';
+    if (judgementNumberDOM) judgementNumberDOM.value = '';
+    dispatch(setJudgementNumber(0));
   };
 
   // ログの開閉
   const handleToggleLog = () => {
-    dispatch(toggleLog());
+    dispatch(toggleDiceLog());
   };
-
-  useEffect(() => {
-    const currentLog: any[] = [];
-    // Firestoreの変更を検知し、DOMの状態を変更 (リアルタイムダイス)
-    const resultQueryCollection = firestore
-      .collection('result')
-      .orderBy('timestamp', 'asc');
-
-    resultQueryCollection.onSnapshot((querySnapshot) => {
-      querySnapshot.docChanges().forEach((change) => {
-        // Firestoreにデータが追加されたとき (※アプリ起動時にも発火する)
-        if (change.type === 'added') {
-          const rawData: firebase.firestore.DocumentData = change.doc.data();
-
-          // ダイス演出を行う
-          if (rawData.dice.type === '何か') {
-            dicePerformance('hiding');
-          } else {
-            dicePerformance('global');
-          }
-
-          // currentResultを最新の結果に更新
-          setCurrentResult(rawData);
-          // ログに最新の結果をunshiftしてstateを更新
-          currentLog.unshift(rawData);
-        }
-      });
-      setResultLog(currentLog);
-    });
-  }, []);
 
   return (
     <Wrapper>
@@ -418,7 +378,7 @@ const RealTimeDice: React.FC = () => {
       <InputArea>
         <span>成功判定値(1 〜 99):</span>
         <input
-          id="js-successNum"
+          id="js-judgementNumber"
           type="number"
           min={1}
           max={99}
@@ -430,7 +390,7 @@ const RealTimeDice: React.FC = () => {
         <button
           type="button"
           onClick={() => handleDiceRoll('global')}
-          disabled={rollingGlobal || rollingLocal}
+          disabled={Boolean(rollingType)}
         >
           ダイスロール!
         </button>
@@ -438,7 +398,7 @@ const RealTimeDice: React.FC = () => {
         <button
           type="button"
           onClick={() => handleDiceRoll('hiding')}
-          disabled={rollingGlobal || rollingLocal}
+          disabled={Boolean(rollingType)}
         >
           出目を伏せてダイスロール!
         </button>
@@ -446,47 +406,49 @@ const RealTimeDice: React.FC = () => {
         <button
           type="button"
           onClick={() => handleDiceRoll('local')}
-          disabled={rollingGlobal || rollingLocal}
+          disabled={Boolean(rollingType)}
         >
           こっそりダイスロール!
         </button>
       </DiceRoll>
-      <ResultDisplay>
-        <Info>
-          {currentResult.playerName} さんが {currentResult.dice.type}{' '}
-          を振りました:
-        </Info>
-        <SingleDisplay isShow={!rollingGlobal}>
-          {Array.isArray(currentResult.dice.single) ? (
-            currentResult.dice.single.map((single: number | string) => (
-              <span key={generateRandomId(8)}>{single}</span>
-            ))
-          ) : (
-            <span>{currentResult.dice.single}</span>
+      {globalResult && (
+        <ResultDisplay>
+          <Info>
+            {globalResult.playerName} さんが {globalResult.dice.type}{' '}
+            を振りました:
+          </Info>
+          <SingleDisplay isShow={rollingType !== ('global' || 'hiding')}>
+            {Array.isArray(globalResult.dice.single) ? (
+              globalResult.dice.single.map((single: number | string) => (
+                <span key={generateRandomId(8)}>{single}</span>
+              ))
+            ) : (
+              <span>{globalResult.dice.single}</span>
+            )}
+          </SingleDisplay>
+          <CurrentDisplay isShow={rollingType !== ('global' || 'hiding')}>
+            {globalResult.dice.last}
+          </CurrentDisplay>
+          {globalResult.judgement && (
+            <Judgement
+              isShow={rollingType !== ('global' || 'hiding')}
+              isEmphasize={
+                globalResult.judgement === 'クリティカル' ||
+                globalResult.judgement === 'ファンブル'
+              }
+            >
+              判定: {globalResult.judgement}
+            </Judgement>
           )}
-        </SingleDisplay>
-        <CurrentDisplay isShow={!rollingGlobal}>
-          {currentResult.dice.last}
-        </CurrentDisplay>
-        {currentResult.success && (
-          <Success
-            isShow={!rollingGlobal}
-            emphasis={
-              currentResult.success === 'クリティカル' ||
-              currentResult.success === 'ファンブル'
-            }
-          >
-            判定: {currentResult.success}
-          </Success>
-        )}
-      </ResultDisplay>
+        </ResultDisplay>
+      )}
       {localResult && (
         <LocalResultDisplay>
           <Info>
             {localResult.playerName} さんが 非公開で {localResult.dice.type}{' '}
             を振りました:
           </Info>
-          <SingleDisplay isShow={!rollingLocal}>
+          <SingleDisplay isShow={rollingType !== ('local' || 'hiding')}>
             {Array.isArray(localResult.dice.single) ? (
               localResult.dice.single.map((single: number | string) => (
                 <span key={generateRandomId(8)}>{single}</span>
@@ -495,32 +457,32 @@ const RealTimeDice: React.FC = () => {
               <span>{localResult.dice.single}</span>
             )}
           </SingleDisplay>
-          <CurrentDisplay isShow={!rollingLocal}>
+          <CurrentDisplay isShow={rollingType !== ('local' || 'hiding')}>
             {localResult.dice.last}
           </CurrentDisplay>
-          {localResult.success && (
-            <Success isShow={!rollingLocal}>
-              判定: {localResult.success}
-            </Success>
+          {localResult.judgement && (
+            <Judgement isShow={rollingType !== ('local' || 'hiding')}>
+              判定: {localResult.judgement}
+            </Judgement>
           )}
         </LocalResultDisplay>
       )}
       <Sound />
-      <LogSwitch isShow={showLog} type="button" onClick={handleToggleLog}>
+      <LogSwitch isShow={diceLog} type="button" onClick={handleToggleLog}>
         ログ
       </LogSwitch>
-      <LogWrapper isShow={showLog}>
+      {/* <LogWrapper isShow={diceLog}>
         <LogInner>
           {resultLog.map((log: Result) => (
             <p key={generateRandomId(8)}>
               [{log.timestamp}]<br />
               <PlayerName>{log.playerName}</PlayerName> さんが {log.dice.type}{' '}
               で {log.dice.last} を出しました。
-              {log.success && log.success !== '????' && `${log.success}です。`}
+              {log.judgement && log.judgement !== '????' && `${log.judgement}です。`}
             </p>
           ))}
         </LogInner>
-      </LogWrapper>
+      </LogWrapper> */}
     </Wrapper>
   );
 };
