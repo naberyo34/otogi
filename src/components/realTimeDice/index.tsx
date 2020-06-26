@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { diceLogsQuery } from 'services/firebase';
 import diceRoll from 'services/diceRoll';
 import formatDate from 'services/formatDate';
 import { State } from 'modules/index';
@@ -84,23 +83,20 @@ const RealTimeDice: React.FC = () => {
   /**
    * ダイス演出を行う
    * @param rollType ダイスロールのタイプ(グローバル、出目伏せ、ローカル)
-   * @param currentResult 最新のダイス結果
    */
-  const dicePerformance = (
-    rollType: 'global' | 'hiding' | 'local',
-    currentResult?: Result
-  ) => {
-    // rollTypeに応じて1秒間の待ち時間を発生させつつ、globalResultも更新する
-    // TODO: globalResultの更新は正直ここでやりたくない……
+  const dicePerformance = (rollType: 'global' | 'hiding' | 'local') => {
+    // サウンドを再生
+    const sound: HTMLMediaElement | null = document.querySelector('#js-sound');
+    if (sound) sound.play();
+
+    // rollTypeに応じて1秒間の待ち時間を発生させる
     switch (rollType) {
       case 'global':
         dispatch(setRollingType('global'));
-        if (currentResult) dispatch(setGlobalResult(currentResult));
         setTimeout(() => dispatch(setRollingType(false)), 1000);
         break;
       case 'hiding':
         dispatch(setRollingType('hiding'));
-        if (currentResult) dispatch(setGlobalResult(currentResult));
         setTimeout(() => dispatch(setRollingType(false)), 1000);
         break;
       case 'local':
@@ -109,10 +105,6 @@ const RealTimeDice: React.FC = () => {
         break;
       default:
     }
-
-    // サウンドを再生
-    const sound: HTMLMediaElement | null = document.querySelector('#js-sound');
-    if (sound) sound.play();
   };
 
   /**
@@ -150,10 +142,10 @@ const RealTimeDice: React.FC = () => {
         break;
       // 出目を伏せてダイスロール(振ったことは通知)
       case 'hiding':
-        // Firestoreに 伏せデータ ???? を送信、0.1秒後にローカルでのみ結果表示
-        // TODO: setTimeoutがダサい
+        // Firestoreには 伏せデータ ???? を送信し、ローカル内でのみ結果表示
         dispatch(addDiceLog.start(hiddenResult));
-        setTimeout(() => dispatch(setLocalResult(newResult)), 100);
+        // TODO: 色々試したがどうしてもFirestoreへの送信が一瞬遅れるので、setTimeoutで調整
+        setTimeout(() => dispatch(setLocalResult(newResult)), 200);
         break;
       // ローカルダイスロール(Firestoreに送信しない)
       case 'local':
@@ -170,31 +162,22 @@ const RealTimeDice: React.FC = () => {
     dispatch(setJudgementNumber(0));
   };
 
-  // TODO: せっかくSagaに移したからuseEffectを使いたくない……
+  // diceLogsの更新(Firestoreが書き換わったとき)をフックにダイスロール演出を行う
   useEffect(() => {
-    let initializeFlg = false;
-    // Firestoreの更新をフックにダイス演出を発火させる
-    // MEMO: Firestoreのデータ変更とStore操作はSaga経由で行う
-    diceLogsQuery.onSnapshot((querySnapshot) => {
-      querySnapshot.docChanges().forEach((change) => {
-        const currentResult = change.doc.data() as Result;
-        // Firestoreにデータが追加されたとき (※アプリ起動時にも発火する)
-        if (change.type === 'added') {
-          // アプリ起動時は演出しない
-          if (!initializeFlg) return;
+    // 最新のダイスが伏せダイスならhiding, そうでないならglobalの演出を実行
+    if (diceLogs[0]) {
+      const currentDiceType = diceLogs[0].dice.type;
+      if (currentDiceType === '何か') {
+        dicePerformance('hiding');
+      } else {
+        dicePerformance('global');
+      }
 
-          // ダイス演出を行う
-          if (currentResult.dice.type === '何か') {
-            dicePerformance('hiding', currentResult);
-          } else {
-            dicePerformance('global', currentResult);
-          }
-        }
-      });
-
-      initializeFlg = true;
-    });
-  }, []);
+      // globalResultを更新
+      dispatch(setGlobalResult(diceLogs[0]));
+    }
+    // eslint-disable-next-line
+  }, [diceLogs]);
 
   return (
     <Wrapper>

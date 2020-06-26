@@ -14,7 +14,8 @@ const ResultWindow: React.FC<Props> = (props) => {
   return (
     <div>
       <div>
-        {result.playerName} さんが {result.dice.type} を振りました:
+        {result.playerName} さんが {isLocal && ' 非公開で '}
+        {result.dice.type} を振りました:
       </div>
       <div>
         {Array.isArray(result.dice.single) ? (
