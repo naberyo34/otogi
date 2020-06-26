@@ -16,11 +16,7 @@ import { allParamCategories } from 'services/params';
 import skillCategories from 'services/skills/skillCategories';
 
 const Wrapper = styled.section`
-  width: calc(100vw - 320px);
-  min-width: 640px;
-  height: 90vh;
-  padding: 0 16px;
-  overflow-y: scroll;
+  margin-left: 16px;
 `;
 
 const PartyForm = styled.form`

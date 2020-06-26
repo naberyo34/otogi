@@ -12,16 +12,23 @@ const GlobalStyle = createGlobalStyle`
     font-family: "ヒラギノ角ゴ ProN W3","Hiragino Kaku Gothic ProN","メイリオ",Meiryo,sans-serif;
     font-size: 62.5%;
     line-height: 1;
+    font-feature-settings: 'palt';
+    background: #f6f6f6;
   }
 
   p {
     line-height: 1.5;
   }
 
-  button {
+  button, select, input {
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    cursor: pointer;
     background: none;
+    border: none;
     appearance: none;
-    border: 0;
   }
 `;
 
