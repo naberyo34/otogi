@@ -13,6 +13,7 @@ const GlobalStyle = createGlobalStyle`
     font-size: 62.5%;
     line-height: 1;
     font-feature-settings: 'palt';
+    color: #333;
     background: #f6f6f6;
   }
 
@@ -24,11 +25,23 @@ const GlobalStyle = createGlobalStyle`
     padding: 0;
     font-family: inherit;
     font-size: inherit;
+    line-height: inherit;
     color: inherit;
     cursor: pointer;
     background: none;
     border: none;
     appearance: none;
+  }
+
+  select, input {
+    padding: 4px 8px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    transition: box-shadow 0.2s;
+
+    &:hover {
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.16);
+    }
   }
 `;
 

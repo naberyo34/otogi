@@ -12,6 +12,13 @@ const Main = styled.main`
 const App: React.FC = () => (
   <BrowserRouter>
     <Main>
+      <p>
+        otogi v0.5 (alpha) 緊急メンテナンス中
+        <br />
+        ご利用中のお客さまには大変ご迷惑をおかけしております。
+        <br />
+        ※session-roomにアクセスすればローカルダイスだけは振れます
+      </p>
       <Route path="/session-room" component={SessionRoom} />
       <Route path="/character-maker" component={CharacterMaker} />
     </Main>

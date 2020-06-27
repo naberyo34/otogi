@@ -16,6 +16,7 @@ const Wrapper = styled.section<StyledProps>`
   width: 100vw;
   font-size: 1.6rem;
   color: #fff;
+  text-align: left;
   transition: bottom 0.24s;
 
   button {

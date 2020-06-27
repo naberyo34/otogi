@@ -23,6 +23,7 @@ const Wrapper = styled.section`
   height: calc(100vh - 32px);
   padding: 32px;
   overflow-y: scroll;
+  text-align: center;
   background: #fff;
   border-radius: 8px;
 `;

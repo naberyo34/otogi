@@ -3,6 +3,11 @@ import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { setJudgementNumber } from 'modules/realTimeDice/actions';
 
+const Wrapper = styled.div`
+  margin-top: 16px;
+  font-size: 1.2rem;
+`;
+
 const JudgeNumberInput: React.FC = () => {
   const dispatch = useDispatch();
 
@@ -28,8 +33,8 @@ const JudgeNumberInput: React.FC = () => {
   };
 
   return (
-    <div>
-      <span>成功判定値(1 〜 99):</span>
+    <Wrapper>
+      <span>成功判定値(1 〜 99): </span>
       <input
         id="js-judgementNumber"
         type="number"
@@ -37,7 +42,7 @@ const JudgeNumberInput: React.FC = () => {
         max={99}
         onChange={(e) => handleInputSucessNum(e)}
       />
-    </div>
+    </Wrapper>
   );
 };
 

@@ -3,6 +3,14 @@ import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { setDiceCount, setDiceSize } from 'modules/realTimeDice/actions';
 
+const Wrapper = styled.div`
+  font-size: 2.4rem;
+
+  span {
+    padding: 0 8px;
+  }
+`;
+
 const DiceSelect: React.FC = () => {
   const dispatch = useDispatch();
 
@@ -28,7 +36,7 @@ const DiceSelect: React.FC = () => {
   };
 
   return (
-    <div>
+    <Wrapper>
       <select onChange={(e) => handleChooseDiceCount(e)}>
         {diceCounts.map((val) => (
           <option key={`diceCount-${val}`} value={val}>
@@ -44,7 +52,7 @@ const DiceSelect: React.FC = () => {
           </option>
         ))}
       </select>
-    </div>
+    </Wrapper>
   );
 };
 
