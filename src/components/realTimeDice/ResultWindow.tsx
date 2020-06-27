@@ -59,7 +59,7 @@ const ResultWindow: React.FC<Props> = (props) => {
       <Last>
         <span>{result.dice.last}</span>
       </Last>
-      {result.judgement && <div>判定: {result.judgement}</div>}
+      {result.judgement && <span>判定: {result.judgement}</span>}
     </Wrapper>
   );
 };
