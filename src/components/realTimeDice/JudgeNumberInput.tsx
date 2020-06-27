@@ -5,6 +5,9 @@ import { setJudgementNumber } from 'modules/realTimeDice/actions';
 
 const Wrapper = styled.div`
   margin-top: 8px;
+`;
+
+const Label = styled.span`
   font-size: 1.2rem;
 `;
 
@@ -34,7 +37,7 @@ const JudgeNumberInput: React.FC = () => {
 
   return (
     <Wrapper>
-      <span>成功判定値(1 〜 99): </span>
+      <Label>成功判定値(1 ~ 99): </Label>
       <input
         id="js-judgementNumber"
         type="number"

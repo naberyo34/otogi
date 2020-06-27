@@ -32,6 +32,7 @@ const Wrapper = styled.section`
 
 const SettingArea = styled.div`
   padding: 16px 32px;
+  font-size: 1.6rem;
   background: #f6f6f6;
 `;
 

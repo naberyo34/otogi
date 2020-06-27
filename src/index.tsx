@@ -27,11 +27,12 @@ const GlobalStyle = createGlobalStyle`
     font-size: inherit;
     line-height: inherit;
     color: inherit;
+    white-space: nowrap;
     cursor: pointer;
     background: #fff;
     appearance: none;
     border: none;
-    border-radius: 2em;
+    border-radius: 2em; 
   }
 `;
 
