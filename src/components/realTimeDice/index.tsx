@@ -18,14 +18,51 @@ import ResultWindow from 'components/realTimeDice/ResultWindow';
 import Sound from 'components/realTimeDice/Sound';
 import LogWindow from 'components/realTimeDice/LogWindow';
 
+interface StyledProps {
+  isLocal?: boolean;
+}
+
 const Wrapper = styled.section`
   width: 320px;
-  height: calc(100vh - 32px);
-  padding: 32px;
-  overflow-y: scroll;
+  padding: 32px 0;
   text-align: center;
   background: #fff;
   border-radius: 8px;
+`;
+
+const SettingArea = styled.div`
+  padding: 16px 32px;
+  background: #f6f6f6;
+`;
+
+const RollArea = styled.div`
+  padding: 0 32px;
+  margin-top: 16px;
+  font-size: 1.6rem;
+  color: #fff;
+`;
+
+const LocalRollArea = styled.div`
+  display: flex;
+  margin-top: 8px;
+`;
+
+const Button = styled.button<StyledProps>`
+  width: 100%;
+  padding: 1em;
+  background: ${(props) =>
+    props.isLocal ? '#333' : 'linear-gradient(90deg, #f093fb, #f5576c)'};
+  border: none;
+  transition: opacity 0.2s;
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.4;
+  }
+
+  &:not(:first-child) {
+    margin-left: 8px;
+  }
 `;
 
 const RealTimeDice: React.FC = () => {
@@ -182,31 +219,37 @@ const RealTimeDice: React.FC = () => {
 
   return (
     <Wrapper>
-      <DiceSelect />
-      <JudgeNumberInput />
-      <div>
-        <button
+      <SettingArea>
+        <DiceSelect />
+        <JudgeNumberInput />
+      </SettingArea>
+      <RollArea>
+        <Button
           type="button"
           onClick={() => handleDiceRoll('global')}
           disabled={Boolean(rollingType)}
         >
           ダイスロール!
-        </button>
-        <button
-          type="button"
-          onClick={() => handleDiceRoll('hiding')}
-          disabled={Boolean(rollingType)}
-        >
-          出目を伏せて
-        </button>
-        <button
-          type="button"
-          onClick={() => handleDiceRoll('local')}
-          disabled={Boolean(rollingType)}
-        >
-          こっそり
-        </button>
-      </div>
+        </Button>
+        <LocalRollArea>
+          <Button
+            isLocal
+            type="button"
+            onClick={() => handleDiceRoll('hiding')}
+            disabled={Boolean(rollingType)}
+          >
+            出目を伏せて
+          </Button>
+          <Button
+            isLocal
+            type="button"
+            onClick={() => handleDiceRoll('local')}
+            disabled={Boolean(rollingType)}
+          >
+            こっそり
+          </Button>
+        </LocalRollArea>
+      </RollArea>
       {globalResult && <ResultWindow result={globalResult} />}
       {localResult && <ResultWindow result={localResult} isLocal />}
       <Sound />

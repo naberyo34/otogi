@@ -24,8 +24,9 @@ const Wrapper = styled.section<StyledProps>`
     height: 32px;
     margin-left: 8px;
     background: rgba(0, 0, 0, 0.64);
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
+    border-radius: 8px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
   }
 `;
 

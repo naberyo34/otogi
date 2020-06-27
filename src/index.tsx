@@ -22,26 +22,16 @@ const GlobalStyle = createGlobalStyle`
   }
 
   button, select, input {
-    padding: 0;
+    padding: 0.5em 1em;
     font-family: inherit;
     font-size: inherit;
     line-height: inherit;
     color: inherit;
     cursor: pointer;
-    background: none;
-    border: none;
+    background: #fff;
     appearance: none;
-  }
-
-  select, input {
-    padding: 4px 8px;
-    border: 1px solid #aaa;
-    border-radius: 4px;
-    transition: box-shadow 0.2s;
-
-    &:hover {
-      box-shadow: 0 0 8px rgba(0, 0, 0, 0.16);
-    }
+    border: none;
+    border-radius: 2em;
   }
 `;
 

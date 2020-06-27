@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { setDiceCount, setDiceSize } from 'modules/realTimeDice/actions';
 
 const Wrapper = styled.div`
-  font-size: 2.4rem;
+  font-size: 1.6rem;
 
   span {
     padding: 0 8px;

@@ -1,7 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  padding: 0 32px;
+  margin-top: 32px;
+`;
 
 const Audio = styled.audio`
   width: 100%;

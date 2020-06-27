@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { setJudgementNumber } from 'modules/realTimeDice/actions';
 
 const Wrapper = styled.div`
-  margin-top: 16px;
+  margin-top: 8px;
   font-size: 1.2rem;
 `;
 
