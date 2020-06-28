@@ -16,19 +16,13 @@ import { allParamCategories } from 'services/params';
 import skillCategories from 'services/skills/skillCategories';
 
 const Wrapper = styled.section`
+  height: calc(100vh - 32px);
   margin-left: 16px;
+  overflow-y: scroll;
 `;
 
 const PartyForm = styled.form`
   margin-top: 16px;
-
-  button {
-    margin-left: 8px;
-    color: white;
-    cursor: pointer;
-    background: black;
-    border-radius: 8px;
-  }
 `;
 
 const SkillSelect = styled.div`
@@ -36,9 +30,15 @@ const SkillSelect = styled.div`
   top: 0;
   padding: 16px 0;
   font-size: 1.2rem;
-  background: white;
+  background: #f6f6f6;
 
   input {
+    display: none;
+  }
+
+  label {
+    cursor: pointer;
+
     &:not(:first-child) {
       margin-left: 8px;
     }
@@ -73,9 +73,6 @@ const ParamsTable = styled.table`
     line-height: 1.5;
     text-align: right;
     border: 2px solid gray;
-  }
-  input {
-    width: 40px;
   }
 `;
 

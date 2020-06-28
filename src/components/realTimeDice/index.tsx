@@ -24,10 +24,13 @@ interface StyledProps {
 
 const Wrapper = styled.section`
   width: 320px;
+  height: calc(100vh - 32px);
   padding: 32px 0;
+  overflow-y: scroll;
   text-align: center;
   background: #fff;
   border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.16);
 `;
 
 const SettingArea = styled.div`
@@ -54,7 +57,7 @@ const Button = styled.button<StyledProps>`
   background: ${(props) =>
     props.isLocal ? '#333' : 'linear-gradient(90deg, #f093fb, #f5576c)'};
   border: none;
-  transition: opacity 0.2s;
+  transition: opacity 0.1s;
 
   &:disabled {
     cursor: default;
@@ -183,14 +186,13 @@ const RealTimeDice: React.FC = () => {
       case 'hiding':
         // Firestoreには 伏せデータ ???? を送信し、ローカル内でのみ結果表示
         dispatch(addDiceLog.start(hiddenResult));
-        // TODO: 色々試したがどうしてもFirestoreへの送信が一瞬遅れるので、setTimeoutで調整
         setTimeout(() => dispatch(setLocalResult(newResult)), 200);
         break;
       // ローカルダイスロール(Firestoreに送信しない)
       case 'local':
         // 演出もlocalResultのセットもローカル内でのみ行う
         dicePerformance('local');
-        dispatch(setLocalResult(newResult));
+        setTimeout(() => dispatch(setLocalResult(newResult)), 200);
         break;
       default:
         break;
@@ -213,7 +215,7 @@ const RealTimeDice: React.FC = () => {
       }
 
       // globalResultを更新
-      dispatch(setGlobalResult(diceLogs[0]));
+      setTimeout(() => dispatch(setGlobalResult(diceLogs[0])), 200);
     }
     // eslint-disable-next-line
   }, [diceLogs]);
@@ -251,8 +253,12 @@ const RealTimeDice: React.FC = () => {
           </Button>
         </LocalRollArea>
       </RollArea>
-      {globalResult && <ResultWindow result={globalResult} />}
-      {localResult && <ResultWindow result={localResult} isLocal />}
+      {globalResult && (
+        <ResultWindow result={globalResult} rollingType={rollingType} />
+      )}
+      {localResult && (
+        <ResultWindow result={localResult} rollingType={rollingType} isLocal />
+      )}
       <Sound />
       <LogWindow diceLogs={diceLogs} />
     </Wrapper>
