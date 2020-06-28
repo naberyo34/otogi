@@ -19,4 +19,9 @@ app.all(
 // 認証後に静的ファイルのホスティングを行う
 app.use(express.static(path.resolve(__dirname, '../build')));
 
+// SPAのため、どのURLにリクエストが飛んできてもindex.htmlを返す
+app.get('/*', (_req, res) => {
+  res.sendFile(path.resolve(__dirname, '../build/index.html'));
+});
+
 exports.firebaseAuth = functions.https.onRequest(app);
