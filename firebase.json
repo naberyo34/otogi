@@ -7,13 +7,12 @@
     "predeploy": "npm --prefix \"$RESOURCE_DIR\" run build"
   },
   "hosting": {
-    "public": "build",
+    "public": "redirect",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
         "source": "**",
-        "destination": "/index.html",
-        "function": "app"
+        "function": "firebaseAuth"
       }
     ]
   }

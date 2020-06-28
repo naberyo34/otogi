@@ -18,7 +18,7 @@ const App: React.FC = () => (
           <br />
           ご利用中のお客さまには大変ご迷惑をおかけしております。
           <br />
-          ※session-roomにアクセスすればローカルダイスだけは振れます
+          ※session-roomにアクセスすれば諸々怪しいものの一応動きます
         </p>
       </Route>
       <Route path="/session-room" component={SessionRoom} />

@@ -1,15 +1,22 @@
-import functions from 'firebase-functions';
+import * as functions from 'firebase-functions';
 import express from 'express';
-import basicAuth from 'express-basic-auth';
+import path from 'path';
 
+// TODO: 型定義ファイルが存在しないのでrequireで読んでる
+// eslint-disable-next-line
+const basicAuth = require('basic-auth-connect');
 const app = express();
 
-app.use(
-  basicAuth({
-    users: {
-      admin: 'passw0rd',
-    },
-  })
+// basic認証
+app.all(
+  '/*',
+  basicAuth(
+    (user: string, password: string) =>
+      user === 'admin' && password === 'passw0rd'
+  )
 );
 
-exports.app = functions.https.onRequest(app);
+// 認証後に静的ファイルのホスティングを行う
+app.use(express.static(path.resolve(__dirname, '../build')));
+
+exports.firebaseAuth = functions.https.onRequest(app);
