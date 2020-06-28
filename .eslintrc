@@ -38,7 +38,7 @@
       "jsx": true
     },
     "ecmaVersion": 11,
-    "project": "./tsconfig.json",
+    "project": ["./tsconfig.json", "./functions/tsconfig.json"],
     "sourceType": "module"
   },
   "rules": {

@@ -11,7 +11,7 @@ export interface PartyViewerState {
 
 // stateの初期化
 const initialState: PartyViewerState = {
-  myCharacter: '',
+  myCharacter: 'DEBUGGER',
   partyCharacters: [],
   selectedCharacter: '',
   selectedSkillView: 'combat',

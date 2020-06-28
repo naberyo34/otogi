@@ -2,11 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
+  padding: 0 32px;
   margin-top: 32px;
-`;
-
-const Description = styled.p`
-  text-align: center;
 `;
 
 const Audio = styled.audio`
@@ -15,7 +12,6 @@ const Audio = styled.audio`
 
 const Sound: React.FC = () => (
   <Wrapper>
-    <Description>DICE SOUND</Description>
     {/* eslint-disable-next-line */}
     <Audio src="./diceroll.wav" controls id="js-sound" />
   </Wrapper>

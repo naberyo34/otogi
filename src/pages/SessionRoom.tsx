@@ -3,9 +3,8 @@ import styled from 'styled-components';
 import RealTimeDice from 'components/realTimeDice';
 import PartyViewer from 'components/partyViewer';
 
-const Wrapper = styled.section`
+const Wrapper = styled.div`
   display: flex;
-  min-width: 960px;
 `;
 
 const SessionRoom: React.FC = () => {

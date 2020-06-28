@@ -137,6 +137,7 @@ const CharacterMaker: React.FC = () => {
 
   useEffect(() => {
     initialize();
+    // eslint-disable-next-line
   }, []);
 
   return (
