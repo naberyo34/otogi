@@ -6,9 +6,12 @@
 - GMの進行の容易さを最優先に考え、まずは最低限の確実に役立つ機能のみに絞って開発していきます。
 ## 機能
 - realTimeDice: 1D100など、様々なダイス結果をリアルタイムで共有することができます。
-- characterMaker (WIP): クトゥルフ神話TRPG のルールに基づいたキャラクターの作成機能です。
+- partyViewer: 事前に保存したキャラクターの情報を一括で閲覧することができます。
+- characterMaker: クトゥルフ神話TRPG のルールに基づいたキャラクターの保存機能です。
 ## 開発コマンド
 - `yarn start`でプレビュー起動。
+- `yarn build`でビルドファイル作成。
+- `firebase deploy`でビルドファイルをデプロイ。
 ## 技術
 - TypeScript
 - React (Hooks)
