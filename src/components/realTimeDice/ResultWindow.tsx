@@ -18,7 +18,7 @@ const Wrapper = styled.div<StyledProps>`
   padding: 32px;
   margin-top: 16px;
   color: ${(props) => (props.isLocal ? '#fff' : 'inherit')};
-  background: ${(props) => (props.isLocal ? '#333' : 'inherit')};
+  background: ${(props) => (props.isLocal ? '#444' : 'inherit')};
 `;
 
 const Inner = styled.div<StyledProps>`
@@ -39,17 +39,31 @@ const Message = styled.p`
 `;
 
 const Single = styled.div`
+  display: flex;
+  justify-content: center;
   margin-top: 8px;
+  font-family: 'Fredoka One', cursive;
   font-size: 1.6rem;
+`;
 
-  span:not(:first-child) {
-    margin-left: 1em;
+const SingleInner = styled.div<StyledProps>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: ${(props) => (props.isLocal ? '1px solid #fff' : '1px solid #333')};
+  border-radius: 50%;
+
+  &:not(:first-child) {
+    margin-left: 4px;
   }
 `;
 
 const Last = styled.div`
   margin-top: 8px;
-  font-size: 8rem;
+  font-family: 'Fredoka One', cursive;
+  font-size: 12rem;
 `;
 
 const Judge = styled.span`
@@ -72,7 +86,9 @@ const ResultWindow: React.FC<Props> = (props) => {
         <Single>
           {Array.isArray(result.dice.single) ? (
             result.dice.single.map((single: number | string) => (
-              <span key={generateRandomId(8)}>{single}</span>
+              <SingleInner key={generateRandomId(8)} isLocal={Boolean(isLocal)}>
+                <span>{single}</span>
+              </SingleInner>
             ))
           ) : (
             <span>{result.dice.single}</span>
