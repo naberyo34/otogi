@@ -13,7 +13,7 @@ const GlobalStyle = createGlobalStyle`
     font-size: 62.5%;
     line-height: 1;
     font-feature-settings: 'palt';
-    color: #333;
+    color: #444;
     background: #f6f6f6;
   }
 

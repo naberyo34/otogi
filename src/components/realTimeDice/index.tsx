@@ -40,6 +40,8 @@ const SettingArea = styled.div`
 `;
 
 const RollArea = styled.div`
+  position: sticky;
+  top: 0;
   padding: 0 32px;
   margin-top: 16px;
   font-size: 1.6rem;
@@ -55,7 +57,7 @@ const Button = styled.button<StyledProps>`
   width: 100%;
   padding: 1em;
   background: ${(props) =>
-    props.isLocal ? '#333' : 'linear-gradient(90deg, #f093fb, #f5576c)'};
+    props.isLocal ? '#444' : 'linear-gradient(90deg, #f093fb, #f5576c)'};
   border: none;
   transition: opacity 0.1s;
 
