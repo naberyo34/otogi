@@ -13,6 +13,7 @@ const Wrapper = styled.section<StyledProps>`
   position: fixed;
   bottom: ${(props) => (props.isOpen ? '0' : '-312px')};
   left: 0;
+  z-index: 100;
   width: 100vw;
   font-size: 1.6rem;
   color: #fff;

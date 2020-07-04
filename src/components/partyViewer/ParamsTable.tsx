@@ -11,6 +11,26 @@ interface Props {
   target?: string;
 }
 
+const Table = styled.table`
+  thead {
+    background: #f6f6f6;
+  }
+
+  th {
+    padding: 8px;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 8px;
+    white-space: nowrap;
+
+    input {
+      border: 1px solid #444;
+    }
+  }
+`;
+
 const ParamsTable: React.FC<Props> = (props) => {
   const { character, target } = props;
   const dispatch = useDispatch();
@@ -75,7 +95,7 @@ const ParamsTable: React.FC<Props> = (props) => {
   };
 
   return (
-    <table>
+    <Table>
       <thead>
         <tr>
           {allParamCategories.map((paramCategory) => (
@@ -112,14 +132,11 @@ const ParamsTable: React.FC<Props> = (props) => {
                         onChange={(e) => handleChangeCurrentParam(e, paramType)}
                       />
                     ) : (
-                      <>{current}</>
-                    )}{' '}
-                    / {max}
+                      <span>{current}</span>
+                    )}
+                    <span> / {max}</span>
                     {isSan && (
-                      <>
-                        <br />
-                        不定: {characterAllParams.madness}
-                      </>
+                      <span> (不定: {characterAllParams.madness})</span>
                     )}
                   </td>
                 );
@@ -135,7 +152,7 @@ const ParamsTable: React.FC<Props> = (props) => {
           })}
         </tr>
       </tbody>
-    </table>
+    </Table>
   );
 };
 

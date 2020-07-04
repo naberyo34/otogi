@@ -5,8 +5,32 @@ import { changeSkillView } from 'modules/partyViewer/actions';
 import { SkillType } from 'interfaces/skill';
 import skillCategories from 'services/skills/skillCategories';
 
+const Wrapper = styled.div`
+  position: sticky;
+  top: 0;
+  display: flex;
+  margin-top: 16px;
+`;
+
+const Tab = styled.div`
+  &:not(:first-child) {
+    border-left: 8px solid #f6f6f6;
+  }
+`;
+
 const Input = styled.input`
   display: none;
+
+  &:checked + label {
+    color: #fff;
+    background: #444;
+  }
+`;
+
+const Label = styled.label`
+  display: block;
+  padding: 8px;
+  background: #fff;
 `;
 
 interface Props {
@@ -24,9 +48,9 @@ const SkillSelect: React.FC<Props> = (props) => {
   };
 
   return (
-    <div>
+    <Wrapper>
       {skillCategories.map((skillCategory) => (
-        <React.Fragment key={`${skillCategory.type}-radio`}>
+        <Tab key={`${skillCategory.type}-radio`}>
           <Input
             type="radio"
             id={skillCategory.type}
@@ -34,10 +58,10 @@ const SkillSelect: React.FC<Props> = (props) => {
             checked={selectedSkillView === skillCategory.type}
             onChange={(e) => handleChangeSkillView(e)}
           />
-          <label htmlFor={skillCategory.type}>{skillCategory.label}</label>
-        </React.Fragment>
+          <Label htmlFor={skillCategory.type}>{skillCategory.label}</Label>
+        </Tab>
       ))}
-    </div>
+    </Wrapper>
   );
 };
 

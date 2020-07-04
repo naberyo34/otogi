@@ -30,7 +30,6 @@ const Wrapper = styled.section`
   text-align: center;
   background: #fff;
   border-radius: 8px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.16);
 `;
 
 const SettingArea = styled.div`
@@ -42,6 +41,7 @@ const SettingArea = styled.div`
 const RollArea = styled.div`
   position: sticky;
   top: 0;
+  z-index: 10;
   padding: 0 32px;
   margin-top: 16px;
   font-size: 1.6rem;
@@ -58,7 +58,6 @@ const Button = styled.button<StyledProps>`
   padding: 1em;
   background: ${(props) =>
     props.isLocal ? '#444' : 'linear-gradient(90deg, #f093fb, #f5576c)'};
-  border: none;
   transition: opacity 0.1s;
 
   &:disabled {
