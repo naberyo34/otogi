@@ -46,17 +46,24 @@ const Single = styled.div`
   font-size: 1.6rem;
 `;
 
-const SingleInner = styled.div<StyledProps>`
+const SingleInner = styled.div`
+  &:not(:first-child) {
+    margin-left: 16px;
+  }
+`;
+
+const SingleSquare = styled.div<StyledProps>`
   display: flex;
   align-items: center;
   justify-content: center;
   width: 32px;
   height: 32px;
   border: ${(props) => (props.isLocal ? '1px solid #fff' : '1px solid #333')};
-  border-radius: 50%;
+  border-radius: 8px;
+  transform: rotate(45deg);
 
-  &:not(:first-child) {
-    margin-left: 4px;
+  span {
+    transform: rotate(-45deg);
   }
 `;
 
@@ -86,8 +93,10 @@ const ResultWindow: React.FC<Props> = (props) => {
         <Single>
           {Array.isArray(result.dice.single) ? (
             result.dice.single.map((single: number | string) => (
-              <SingleInner key={generateRandomId(8)} isLocal={Boolean(isLocal)}>
-                <span>{single}</span>
+              <SingleInner key={generateRandomId(8)}>
+                <SingleSquare isLocal={Boolean(isLocal)}>
+                  <span>{single}</span>
+                </SingleSquare>
               </SingleInner>
             ))
           ) : (

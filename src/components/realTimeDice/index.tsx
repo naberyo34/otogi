@@ -42,6 +42,7 @@ const SettingArea = styled.div`
 const RollArea = styled.div`
   position: sticky;
   top: 0;
+  z-index: 10;
   padding: 0 32px;
   margin-top: 16px;
   font-size: 1.6rem;
