@@ -10,11 +10,38 @@ import ParamsTable from 'components/partyViewer/ParamsTable';
 import SkillsTable from 'components/partyViewer/SkillsTable';
 
 const Wrapper = styled.div`
-  width: 640px;
+  width: calc(100vw - 368px);
   height: calc(100vh - 32px);
-  margin-left: 32px;
+  margin-left: 16px;
   overflow-y: scroll;
   font-size: 1.2rem;
+`;
+
+const MyStatus = styled.div`
+  width: 100%;
+  padding: 16px;
+  overflow-x: scroll;
+  background: #fff;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
+`;
+
+const PartyCharacterName = styled.p`
+  padding-left: 8px;
+  margin-top: 8px;
+  border-left: 4px solid;
+  border-image: linear-gradient(#f093fb, #f5576c);
+  border-image-slice: 1;
+`;
+
+const PartyStatus = styled.div`
+  width: 100%;
+  padding: 16px;
+  margin-top: 8px;
+  overflow-x: scroll;
+  background: #fff;
+  border-radius: 8px;
 `;
 
 const PartyViewer: React.FC = () => {
@@ -56,15 +83,15 @@ const PartyViewer: React.FC = () => {
   return (
     <Wrapper>
       <CharacterSelect characters={characters} />
+      <SkillSelect selectedSkillView={selectedSkillView} />
       {myCharacterData && (
-        <div>
-          <p>{myCharacterData.name}</p>
+        <MyStatus>
           <ParamsTable character={myCharacterData} target={myCharacter} />
           <SkillsTable
             character={myCharacterData}
             selectedSkillView={selectedSkillView}
           />
-        </div>
+        </MyStatus>
       )}
       <PartySelect
         characters={characters}
@@ -72,16 +99,17 @@ const PartyViewer: React.FC = () => {
         selectedCharacter={selectedCharacter}
       />
       {partyCharactersData.map((partyCharacterData) => (
-        <div key={`${partyCharacterData.name}-status`}>
-          <p>{partyCharacterData.name}</p>
-          <ParamsTable character={partyCharacterData} />
-          <SkillsTable
-            character={partyCharacterData}
-            selectedSkillView={selectedSkillView}
-          />
-        </div>
+        <>
+          <PartyCharacterName>{partyCharacterData.name}</PartyCharacterName>
+          <PartyStatus key={`${partyCharacterData.name}-status`}>
+            <ParamsTable character={partyCharacterData} />
+            <SkillsTable
+              character={partyCharacterData}
+              selectedSkillView={selectedSkillView}
+            />
+          </PartyStatus>
+        </>
       ))}
-      <SkillSelect selectedSkillView={selectedSkillView} />
     </Wrapper>
   );
 };

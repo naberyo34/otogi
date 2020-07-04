@@ -9,6 +9,39 @@ interface Props {
   selectedSkillView: SkillType;
 }
 
+interface StyledProps {
+  point: number;
+}
+
+const Table = styled.table`
+  thead {
+    background: #f6f6f6;
+  }
+
+  th {
+    padding: 8px;
+    white-space: nowrap;
+  }
+`;
+
+const Point = styled.td<StyledProps>`
+  padding: 8px;
+  font-size: 1.6rem;
+  background: ${(props) => {
+    const { point } = props;
+
+    if (point >= 80) return '#f5b041';
+    if (point >= 60) return '#f8c471';
+    if (point >= 40) return '#fad7a0';
+    if (point >= 20) return '#fdebd0';
+    return 'inherit';
+  }};
+`;
+
+const Percent = styled.span`
+  font-size: 1.2rem;
+`;
+
 const SkillsTable: React.FC<Props> = (props) => {
   const { character, selectedSkillView } = props;
 
@@ -17,7 +50,7 @@ const SkillsTable: React.FC<Props> = (props) => {
       {skillCategories.map((skillCategory) => (
         <>
           {selectedSkillView === skillCategory.type && (
-            <table key={`${character.name}-${skillCategory.type}`}>
+            <Table key={`${character.name}-${skillCategory.type}`}>
               <thead>
                 <tr>
                   {(character[`${skillCategory.type}Skills`] as Skill[]).map(
@@ -34,14 +67,20 @@ const SkillsTable: React.FC<Props> = (props) => {
                 <tr>
                   {(character[`${skillCategory.type}Skills`] as Skill[]).map(
                     (skill) => (
-                      <td key={`${character.name}-${skill.name}-point`}>
-                        {`${skill.point}%`}
-                      </td>
+                      <Point
+                        key={`${character.name}-${skill.name}-point`}
+                        point={skill.point}
+                      >
+                        <span>
+                          {`${skill.point}`}
+                          <Percent>%</Percent>
+                        </span>
+                      </Point>
                     )
                   )}
                 </tr>
               </tbody>
-            </table>
+            </Table>
           )}
         </>
       ))}

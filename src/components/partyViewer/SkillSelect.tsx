@@ -6,13 +6,15 @@ import { SkillType } from 'interfaces/skill';
 import skillCategories from 'services/skills/skillCategories';
 
 const Wrapper = styled.div`
+  position: sticky;
+  top: 0;
   display: flex;
   margin-top: 16px;
 `;
 
 const Tab = styled.div`
   &:not(:first-child) {
-    margin-left: 8px;
+    border-left: 8px solid #f6f6f6;
   }
 `;
 
@@ -28,7 +30,7 @@ const Input = styled.input`
 const Label = styled.label`
   display: block;
   padding: 8px;
-  background: #ddd;
+  background: #fff;
 `;
 
 interface Props {

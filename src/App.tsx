@@ -5,7 +5,6 @@ import SessionRoom from 'pages/SessionRoom';
 import CharacterMaker from 'pages/CharacterMaker';
 
 const Main = styled.main`
-  min-width: 1024px;
   padding: 16px;
 `;
 
