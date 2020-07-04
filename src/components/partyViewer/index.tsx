@@ -9,6 +9,11 @@ import SkillSelect from 'components/partyViewer/SkillSelect';
 import ParamsTable from 'components/partyViewer/ParamsTable';
 import SkillsTable from 'components/partyViewer/SkillsTable';
 
+const Wrapper = styled.div`
+  margin-left: 16px;
+  font-size: 1.2rem;
+`;
+
 const PartyViewer: React.FC = () => {
   const characters = useSelector(
     (state: State) => state.firebaseReducer.characters
@@ -46,7 +51,7 @@ const PartyViewer: React.FC = () => {
   const partyCharactersData: Character[] = findPartyCharactersData();
 
   return (
-    <div>
+    <Wrapper>
       <p>あなたの名前は:</p>
       <CharacterSelect characters={characters} />
       <PartySelect
@@ -75,7 +80,7 @@ const PartyViewer: React.FC = () => {
           />
         </div>
       ))}
-    </div>
+    </Wrapper>
   );
 };
 

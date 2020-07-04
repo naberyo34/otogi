@@ -13,20 +13,24 @@ const CharacterSelect: React.FC<Props> = (props) => {
   const dispatch = useDispatch();
 
   // 選択したキャラクターをマイキャラクターとして設定
-  const handleSetMyCharacter = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleSetMyCharacter = (e: any) => {
     const { value } = e.target;
     dispatch(setMyCharacter(value));
   };
 
   return (
-    <select onChange={(e) => handleSetMyCharacter(e)}>
-      <option value="">選択してください</option>
-      {characters.map((character) => (
-        <option key={`$myCharacter-${character.name}`} value={character.name}>
-          {character.name}
-        </option>
-      ))}
-    </select>
+    <>
+      <p>自由入力はここから (一時的措置)</p>
+      <input type="text" onChange={(e) => handleSetMyCharacter(e)} />
+      <select onChange={(e) => handleSetMyCharacter(e)}>
+        <option value="">DBから選ぶ場合はこちら</option>
+        {characters.map((character) => (
+          <option key={`$myCharacter-${character.name}`} value={character.name}>
+            {character.name}
+          </option>
+        ))}
+      </select>
+    </>
   );
 };
 
