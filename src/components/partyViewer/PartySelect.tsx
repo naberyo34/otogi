@@ -7,6 +7,36 @@ import {
 } from 'modules/partyViewer/actions';
 import Character from 'interfaces/character';
 
+const Form = styled.form`
+  margin-top: 16px;
+
+  &:hover {
+    h2 {
+      color: #ddd;
+    }
+  }
+`;
+
+const Title = styled.h2`
+  font-family: 'Fredoka One', cursive;
+  font-size: 6.4rem;
+  color: #eee;
+  transition: color 0.2s;
+`;
+
+const Select = styled.select`
+  width: 240px;
+  padding: 0.75em 1em;
+  margin-top: 8px;
+`;
+
+const Button = styled.button`
+  padding: 0.75em 1em;
+  margin-left: 8px;
+  color: #fff;
+  background: #444;
+`;
+
 interface Props {
   characters: Character[];
   partyCharacters: string[];
@@ -33,12 +63,9 @@ const PartySelect: React.FC<Props> = (props) => {
   };
 
   return (
-    <form onSubmit={(e) => handleSetPartyCharacters(e)}>
-      <p>
-        パーティに追加
-        (自分以外のキャラクターの情報が閲覧できます。自分だけが見えています):
-      </p>
-      <select onChange={(e) => handleChangePartyCharacter(e)}>
+    <Form onSubmit={(e) => handleSetPartyCharacters(e)}>
+      <Title>PARTY</Title>
+      <Select onChange={(e) => handleChangePartyCharacter(e)}>
         <option value="">選択してください</option>
         {characters.map((character) => (
           <option
@@ -48,9 +75,9 @@ const PartySelect: React.FC<Props> = (props) => {
             {character.name}
           </option>
         ))}
-      </select>
-      <button type="submit">追加</button>
-    </form>
+      </Select>
+      <Button type="submit">追加</Button>
+    </Form>
   );
 };
 

@@ -10,7 +10,10 @@ import ParamsTable from 'components/partyViewer/ParamsTable';
 import SkillsTable from 'components/partyViewer/SkillsTable';
 
 const Wrapper = styled.div`
-  margin-left: 16px;
+  width: 640px;
+  height: calc(100vh - 32px);
+  margin-left: 32px;
+  overflow-y: scroll;
   font-size: 1.2rem;
 `;
 
@@ -52,14 +55,7 @@ const PartyViewer: React.FC = () => {
 
   return (
     <Wrapper>
-      <p>あなたの名前は:</p>
       <CharacterSelect characters={characters} />
-      <PartySelect
-        characters={characters}
-        partyCharacters={partyCharacters}
-        selectedCharacter={selectedCharacter}
-      />
-      <SkillSelect selectedSkillView={selectedSkillView} />
       {myCharacterData && (
         <div>
           <p>{myCharacterData.name}</p>
@@ -70,6 +66,11 @@ const PartyViewer: React.FC = () => {
           />
         </div>
       )}
+      <PartySelect
+        characters={characters}
+        partyCharacters={partyCharacters}
+        selectedCharacter={selectedCharacter}
+      />
       {partyCharactersData.map((partyCharacterData) => (
         <div key={`${partyCharacterData.name}-status`}>
           <p>{partyCharacterData.name}</p>
@@ -80,6 +81,7 @@ const PartyViewer: React.FC = () => {
           />
         </div>
       ))}
+      <SkillSelect selectedSkillView={selectedSkillView} />
     </Wrapper>
   );
 };
