@@ -23,6 +23,7 @@ interface StyledProps {
 }
 
 const Wrapper = styled.section`
+  flex-shrink: 0;
   width: 320px;
   height: calc(100vh - 32px);
   padding: 32px 0;

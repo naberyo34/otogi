@@ -24,7 +24,7 @@ const GlobalStyle = createGlobalStyle`
     line-height: 1.5;
   }
 
-  button, select, input {
+  button, select, input, label {
     padding: 0.5em 1em;
     font-family: inherit;
     font-size: inherit;

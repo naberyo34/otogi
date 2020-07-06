@@ -10,7 +10,6 @@ import ParamsTable from 'components/partyViewer/ParamsTable';
 import SkillsTable from 'components/partyViewer/SkillsTable';
 
 const Wrapper = styled.div`
-  width: calc(100vw - 368px);
   height: calc(100vh - 32px);
   margin-left: 16px;
   overflow-y: scroll;
@@ -22,17 +21,7 @@ const MyStatus = styled.div`
   padding: 16px;
   overflow-x: scroll;
   background: #fff;
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
-  border-bottom-left-radius: 8px;
-`;
-
-const PartyCharacterName = styled.p`
-  padding-left: 8px;
-  margin-top: 8px;
-  border-left: 4px solid;
-  border-image: linear-gradient(#f093fb, #f5576c);
-  border-image-slice: 1;
+  border-radius: 8px;
 `;
 
 const PartyStatus = styled.div`
@@ -42,6 +31,24 @@ const PartyStatus = styled.div`
   overflow-x: scroll;
   background: #fff;
   border-radius: 8px;
+`;
+
+const PartyCharacterName = styled.span`
+  position: relative;
+  display: inline-block;
+  margin: 16px 2em 0;
+
+  &::before {
+    position: absolute;
+    left: -1.5em;
+    display: block;
+    width: 1em;
+    height: 1em;
+    content: '';
+    background: linear-gradient(90deg, #f093fb, #f5576c);
+    border-radius: 2px;
+    transform: rotate(45deg);
+  }
 `;
 
 const PartyViewer: React.FC = () => {

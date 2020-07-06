@@ -8,13 +8,16 @@ import skillCategories from 'services/skills/skillCategories';
 const Wrapper = styled.div`
   position: sticky;
   top: 0;
+  z-index: 10;
   display: flex;
-  margin-top: 16px;
+  padding-bottom: 8px;
+  margin-top: 32px;
+  background: #f6f6f6;
 `;
 
 const Tab = styled.div`
   &:not(:first-child) {
-    border-left: 8px solid #f6f6f6;
+    margin-left: 8px;
   }
 `;
 
@@ -28,9 +31,7 @@ const Input = styled.input`
 `;
 
 const Label = styled.label`
-  display: block;
-  padding: 8px;
-  background: #fff;
+  display: inline-block;
 `;
 
 interface Props {
