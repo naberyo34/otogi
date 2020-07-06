@@ -12,45 +12,6 @@ import { initialCharacter } from 'modules/characterMaker/reducers';
 import InputCharacterParams from 'components/characterMaker/InputCharacterParams';
 import InputCharacterSkills from 'components/characterMaker/InputCharacterSkills';
 
-const Wrapper = styled.section`
-  width: 100vw;
-  padding: 16px;
-`;
-
-const Title = styled.h2`
-  font-size: 1.6rem;
-`;
-
-const Description = styled.p`
-  margin-top: 8px;
-  font-size: 1.2rem;
-`;
-
-const SelectEdit = styled.select`
-  margin-top: 16px;
-  font-size: 1.6rem;
-`;
-
-const PlayerName = styled.p`
-  margin-top: 16px;
-  font-size: 1.6rem;
-`;
-
-const InputName = styled.input`
-  margin-top: 16px;
-  font-size: 1.6rem;
-`;
-
-const Submit = styled.input`
-  width: 100%;
-  padding: 4px;
-  margin-top: 16px;
-  color: white;
-  background: red;
-  border: none;
-  border-radius: 4px;
-`;
-
 const CharacterMaker: React.FC = () => {
   const dispatch = useDispatch();
   const makingCharacter = useSelector(
@@ -141,46 +102,32 @@ const CharacterMaker: React.FC = () => {
   }, []);
 
   return (
-    <Wrapper>
-      <Title>キャラクターメーカー (beta ver.)</Title>
-      <Description>
-        いまのところクトゥルフ神話TRPG 旧ルールフォーマットのみ対応。
-        <br />
-        開発中のため、他サービスで作成済のキャラクターを投入して使ってください。
-        <br />
-        ※スキルの数値が空欄の場合は0として扱います。
-      </Description>
-      <form onSubmit={(e) => handleSubmit(e)}>
-        <SelectEdit onChange={(e) => handleChangeEditCharacter(e)}>
-          <option value="">新規作成</option>
-          {characters.map((character) => (
-            <option
-              key={`$editCharacter-${character.name}`}
-              value={character.name}
-            >
-              {character.name}
-            </option>
-          ))}
-        </SelectEdit>
-        {!editCharacter && (
-          <>
-            <PlayerName>プレイヤー名 (変更不可)</PlayerName>
-            <InputName
-              type="text"
-              placeholder="五味 葛男"
-              onChange={(e) => handleMakingCharacterName(e)}
-              value={makingCharacter.name}
-            />
-            <InputCharacterParams />
-          </>
-        )}
-        <InputCharacterSkills />
-        <Submit
-          type="submit"
-          value={editCharacter ? '更新する!' : '作成する!'}
-        />
-      </form>
-    </Wrapper>
+    <form onSubmit={(e) => handleSubmit(e)}>
+      <select onChange={(e) => handleChangeEditCharacter(e)}>
+        <option value="">新規作成</option>
+        {characters.map((character) => (
+          <option
+            key={`$editCharacter-${character.name}`}
+            value={character.name}
+          >
+            {character.name}
+          </option>
+        ))}
+      </select>
+      {!editCharacter && (
+        <>
+          <input
+            type="text"
+            placeholder="五味 葛男"
+            onChange={(e) => handleMakingCharacterName(e)}
+            value={makingCharacter.name}
+          />
+          <InputCharacterParams />
+        </>
+      )}
+      <InputCharacterSkills />
+      <input type="submit" value={editCharacter ? '更新する!' : '作成する!'} />
+    </form>
   );
 };
 

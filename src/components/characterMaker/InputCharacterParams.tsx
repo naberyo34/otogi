@@ -6,37 +6,6 @@ import { changeCharacterParams } from 'modules/characterMaker/actions';
 import { ParamType } from 'interfaces/param';
 import { paramsRange } from 'services/params';
 
-const Wrapper = styled.section`
-  margin-top: 32px;
-`;
-
-const Title = styled.h3`
-  margin-top: 16px;
-  font-size: 1.6rem;
-`;
-
-const Table = styled.table`
-  margin-top: 8px;
-  font-size: 1.2rem;
-  border: 2px solid black;
-  thead {
-    color: white;
-    background: black;
-  }
-  th {
-    width: 60px;
-    padding: 4px;
-    border: 2px solid black;
-  }
-  td {
-    padding: 4px;
-    border: 2px solid black;
-  }
-  input {
-    width: 60px;
-  }
-`;
-
 const InputCharacterParams: React.FC = () => {
   const dispatch = useDispatch();
   const foundationParams = useSelector(
@@ -112,17 +81,16 @@ const InputCharacterParams: React.FC = () => {
   });
 
   return (
-    <Wrapper>
-      <Title>基礎ステータス (変更不可)</Title>
-      <Table>
+    <>
+      <table>
         <thead>
           <tr>{thArray}</tr>
         </thead>
         <tbody>
           <tr>{tdArray}</tr>
         </tbody>
-      </Table>
-    </Wrapper>
+      </table>
+    </>
   );
 };
 

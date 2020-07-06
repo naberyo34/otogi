@@ -20,38 +20,6 @@ interface TableElements {
   [key: string]: JSX.Element[];
 }
 
-const Wrapper = styled.div`
-  width: 100%;
-  overflow-x: scroll;
-`;
-
-const Title = styled.h3`
-  margin-top: 16px;
-  font-size: 1.6rem;
-`;
-
-const Table = styled.table`
-  margin-top: 8px;
-  font-size: 1.2rem;
-  border: 2px solid gray;
-  thead {
-    color: white;
-    background: gray;
-  }
-  th {
-    width: 60px;
-    padding: 4px;
-    border: 2px solid gray;
-  }
-  td {
-    padding: 4px;
-    border: 2px solid gray;
-  }
-  input {
-    width: 60px;
-  }
-`;
-
 const InputCharacterSkills: React.FC = () => {
   const dispatch = useDispatch();
   const makingCharacter = useSelector(
@@ -200,23 +168,20 @@ const InputCharacterSkills: React.FC = () => {
     const thKey = `${skillCategory.type}Th`;
     const tdKey = `${skillCategory.type}Td`;
     const table = (
-      <>
-        <Title>{skillCategory.label}</Title>
-        <Table>
-          <thead>
-            <tr>{tableElements[thKey]}</tr>
-          </thead>
-          <tbody>
-            <tr>{tableElements[tdKey]}</tr>
-          </tbody>
-        </Table>
-      </>
+      <table>
+        <thead>
+          <tr>{tableElements[thKey]}</tr>
+        </thead>
+        <tbody>
+          <tr>{tableElements[tdKey]}</tr>
+        </tbody>
+      </table>
     );
 
     tables.push(table);
   });
 
-  return <Wrapper>{tables}</Wrapper>;
+  return <>{tables}</>;
 };
 
 export default InputCharacterSkills;
